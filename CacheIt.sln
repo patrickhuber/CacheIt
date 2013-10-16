@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		CacheIt.vsmdi = CacheIt.vsmdi
 		Local.testsettings = Local.testsettings
+		README.md = README.md
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
@@ -26,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{02FCF2
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Lucene", "CacheIt.Lucene\CacheIt.Lucene.csproj", "{2DEAC10F-C29E-4521-855F-7D4828472A44}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
@@ -56,6 +59,10 @@ Global
 		{D526E74D-F9B6-4480-9F31-876165DB7172}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D526E74D-F9B6-4480-9F31-876165DB7172}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D526E74D-F9B6-4480-9F31-876165DB7172}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DEAC10F-C29E-4521-855F-7D4828472A44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DEAC10F-C29E-4521-855F-7D4828472A44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DEAC10F-C29E-4521-855F-7D4828472A44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DEAC10F-C29E-4521-855F-7D4828472A44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

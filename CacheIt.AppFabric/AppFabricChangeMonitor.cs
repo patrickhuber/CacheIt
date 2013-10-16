@@ -5,7 +5,18 @@ using System.Text;
 
 namespace CacheIt.AppFabric
 {
-    class AppFabricChangeMonitor : CacheEntryChangeMonitorBase
+    /// <summary>
+    /// 
+    /// </summary>
+    public class AppFabricChangeMonitor : CacheEntryChangeMonitorBase
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AppFabricChangeMonitor"/> class.
+        /// </summary>
+        /// <param name="keys">The keys.</param>
+        /// <param name="regionName">Name of the region.</param>
+        public AppFabricChangeMonitor(IEnumerable<string> keys, string regionName = null)
+            : base(keys, regionName) 
+        { }
     }
 }
