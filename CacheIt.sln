@@ -1,0 +1,66 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Web.Mvc", "CacheIt.Web.Mvc\CacheIt.Web.Mvc.csproj", "{5D9E9F32-B179-4DF7-93EF-32A83BB4C281}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Web", "CacheIt.Web\CacheIt.Web.csproj", "{A7439144-1BBE-4CBC-8F33-7AF1BA3897E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt", "CacheIt\CacheIt.csproj", "{82BE94D9-3C7E-41F6-A18E-C2ADF429F9A4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0B38BBBC-C1EE-47D5-B00A-64FB59F62733}"
+	ProjectSection(SolutionItems) = preProject
+		CacheIt.vsmdi = CacheIt.vsmdi
+		Local.testsettings = Local.testsettings
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DD1066DC-6128-43F0-98A6-182C7E9419A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.UnitTests", "CacheIt.UnitTests\CacheIt.UnitTests.csproj", "{8FE6F17E-EC43-4ACB-A740-C13FD96394A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.AppFabric", "CacheIt.AppFabric\CacheIt.AppFabric.csproj", "{D526E74D-F9B6-4480-9F31-876165DB7172}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{02FCF211-C71D-497A-A7CF-5FFEDC9C5557}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = CacheIt.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5D9E9F32-B179-4DF7-93EF-32A83BB4C281}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D9E9F32-B179-4DF7-93EF-32A83BB4C281}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D9E9F32-B179-4DF7-93EF-32A83BB4C281}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D9E9F32-B179-4DF7-93EF-32A83BB4C281}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7439144-1BBE-4CBC-8F33-7AF1BA3897E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7439144-1BBE-4CBC-8F33-7AF1BA3897E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7439144-1BBE-4CBC-8F33-7AF1BA3897E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7439144-1BBE-4CBC-8F33-7AF1BA3897E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82BE94D9-3C7E-41F6-A18E-C2ADF429F9A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82BE94D9-3C7E-41F6-A18E-C2ADF429F9A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82BE94D9-3C7E-41F6-A18E-C2ADF429F9A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82BE94D9-3C7E-41F6-A18E-C2ADF429F9A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FE6F17E-EC43-4ACB-A740-C13FD96394A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FE6F17E-EC43-4ACB-A740-C13FD96394A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FE6F17E-EC43-4ACB-A740-C13FD96394A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FE6F17E-EC43-4ACB-A740-C13FD96394A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D526E74D-F9B6-4480-9F31-876165DB7172}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D526E74D-F9B6-4480-9F31-876165DB7172}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D526E74D-F9B6-4480-9F31-876165DB7172}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D526E74D-F9B6-4480-9F31-876165DB7172}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8FE6F17E-EC43-4ACB-A740-C13FD96394A1} = {DD1066DC-6128-43F0-98A6-182C7E9419A9}
+	EndGlobalSection
+EndGlobal
