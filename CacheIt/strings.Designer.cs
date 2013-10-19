@@ -86,5 +86,14 @@ namespace CacheIt {
                 return ResourceManager.GetString("CacheIt_IO_WriteDisabledDisposing", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Region Name is not supported by this implementation. .
+        /// </summary>
+        internal static string CacheIt_RegionName_not_supported {
+            get {
+                return ResourceManager.GetString("CacheIt_RegionName_not_supported", resourceCulture);
+            }
+        }
     }
 }

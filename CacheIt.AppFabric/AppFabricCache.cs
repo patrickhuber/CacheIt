@@ -81,9 +81,12 @@ namespace CacheIt.AppFabric
             }
         }
 
-        public override System.Runtime.Caching.CacheItem GetCacheItem(string key, string regionName = null)
-        {
-            throw new NotImplementedException();
+        public override CacheItem GetCacheItem(string key, string regionName = null)
+        {   
+            if (regionName == null)
+                return cache.Get(key) as CacheItem;
+            
+            return cache.Get(key, regionName) as CacheItem;            
         }
 
         public override long GetCount(string regionName = null)
@@ -103,11 +106,21 @@ namespace CacheIt.AppFabric
 
         public override object Remove(string key, string regionName = null)
         {
-            throw new NotImplementedException();
+            var instance = Get(key, regionName);
+            if (regionName == null)
+                cache.Remove(key);
+            else
+                cache.Remove(key, regionName);
+            return instance;
         }
 
-        public override void Set(System.Runtime.Caching.CacheItem item, System.Runtime.Caching.CacheItemPolicy policy)
+        public override void Set(CacheItem item, CacheItemPolicy policy)
         {
+            // need to convert policy to TimeSpan
+            if (item.RegionName == null)
+                cache.Put(item.Key, item, DateTime.Now - policy.AbsoluteExpiration.DateTime);
+            else
+                cache.Put(item.Key, item, DateTime.Now - policy.AbsoluteExpiration.DateTime, item.RegionName);
             throw new NotImplementedException();
         }
     }

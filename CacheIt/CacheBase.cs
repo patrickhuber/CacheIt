@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Caching;
 using CacheIt.Diagnostics;
+using System.Collections;
 
 namespace CacheIt
 {
@@ -11,7 +12,7 @@ namespace CacheIt
     /// Defines an abstract cache base class with common operations implemented for the rest of the library.
     /// </summary>
     public abstract class CacheBase
-        : ObjectCache
+        : ObjectCache, IEnumerable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CacheBase"/> class.
@@ -114,7 +115,11 @@ namespace CacheIt
         /// </returns>
         public override object Get(string key, string regionName = null)
         {
-            CacheItem cacheItem = GetCacheItem(key, regionName);
+            if ((DefaultCacheCapabilities & System.Runtime.Caching.DefaultCacheCapabilities.CacheRegions) != 0)
+                throw new NotSupportedException(strings.CacheIt_RegionName_not_supported);
+            if (key == null)
+                throw new ArgumentNullException("key");
+            var cacheItem = GetCacheItem(key, regionName);
             if (cacheItem == null)
                 return null;
             return cacheItem.Value;

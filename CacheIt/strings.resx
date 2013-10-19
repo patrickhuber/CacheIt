@@ -126,4 +126,7 @@
   <data name="CacheIt_IO_WriteDisabledDisposing" xml:space="preserve">
     <value>Write is disabled because the object is disposing.</value>
   </data>
+  <data name="CacheIt_RegionName_not_supported" xml:space="preserve">
+    <value>Region Name is not supported by this implementation. </value>
+  </data>
 </root>
