@@ -38,7 +38,9 @@ namespace CacheIt.IO
             this.key = key;
             this.region = region;
             buffer = new byte[bufferSize];
-            header = new ChunkStreamHeader(bufferSize);
+
+            // create the header if it doesn't exist
+            header = objectCache.Get(key, region, ()=>new ChunkStreamHeader(bufferSize));
 
             canRead = true;
             canSeek = true;
@@ -129,9 +131,13 @@ namespace CacheIt.IO
         /// </summary>
         /// <exception cref="System.NotImplementedException"></exception>
         public override void Flush()
-        {
+        {   
+            // generate the buffer key and save the current buffer
             var key = GenerateBufferKey(position);
-            cache.Set(key, buffer);
+            cache.Set(key, buffer, region);
+
+            // save the file header as well
+            SaveHeader();
         }
 
         /// <summary>
@@ -157,10 +163,10 @@ namespace CacheIt.IO
 
             if (position > value)
                 position = value;
-
-            this.header.Length = value;
+                        
+            this.SaveHeader(value);
         }
-        
+
         /// <summary>
         /// Sets the position within the current stream.
         /// </summary>
@@ -169,6 +175,7 @@ namespace CacheIt.IO
         /// <returns>
         /// The new position within the current stream.
         /// </returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
         /// <exception cref="System.NotImplementedException"></exception>
         public override long Seek(long offset, SeekOrigin origin)
         {
@@ -201,8 +208,11 @@ namespace CacheIt.IO
                 absoluteOffset = this.Header.Length + offset;
             }
 
+            // if we are growing the size of the stream
             if (absoluteOffset > this.Header.Length)
-                this.header.Length = absoluteOffset;
+            {
+                this.SaveHeader(absoluteOffset);
+            }
 
             // determine the current buffer index and the new buffer index
             string currentBufferKey = this.GenerateBufferKey(position);
@@ -210,7 +220,7 @@ namespace CacheIt.IO
 
             // if the indicies are different, we need to load the buffer at the index.
             if (currentBufferKey != newBufferKey)
-            {
+            {                
                 // save the current buffer
                 cache.Set(currentBufferKey, buffer, region);
 
@@ -351,7 +361,9 @@ namespace CacheIt.IO
 
             // set the header length if the position is greater than the previous size
             if (position > this.header.Length)
-                this.header.Length = position;
+            {                
+                this.SaveHeader(position);
+            }
         }
 
         #endregion Stream
@@ -443,6 +455,24 @@ namespace CacheIt.IO
         protected virtual string GenerateBufferKey(int bufferIndex)
         {
             return string.Format("{0}_{1}", key, bufferIndex);
+        }
+
+        /// <summary>
+        /// Saves the header.
+        /// </summary>
+        protected virtual void SaveHeader()
+        { 
+            cache.Set(key, this.header, region);            
+        }
+
+        /// <summary>
+        /// Saves the header.
+        /// </summary>
+        /// <param name="length">The length.</param>
+        protected virtual void SaveHeader(long length)
+        {
+            this.header.Length = length;
+            cache.Set(key, this.header, region);
         }
     }
 }
