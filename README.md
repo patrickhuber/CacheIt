@@ -8,3 +8,7 @@ SessionCache
 WebCache
 ### AppFabric 1.1
 AppFabricCache
+
+## Known Dependencies
+### CacheIt.Lucene
+See link [here](CacheIt.Lucene/CacheIt.Lucene.md) for documentation 
