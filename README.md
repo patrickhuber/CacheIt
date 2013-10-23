@@ -2,13 +2,13 @@
 ## A Cache Abstraction Framework
 CacheIt is based on the System.Runtime.Caching abstract classes. It implements several providers for popular caching systems.
 ## Caches Implemented
-### System.Web
-SessionCache
+### System.Web [(link)](CacheIt.Web/CacheIte.Web.md)
+* SessionCache
+* WebCache
 
-WebCache
-### AppFabric 1.1
-AppFabricCache
+### AppFabric 1.1 [(link)](CacheIt.AppFabric/CacheIt.AppFabric.md)
+* AppFabricCache
 
-## Known Dependencies
-### CacheIt.Lucene
-See link [here](CacheIt.Lucene/CacheIt.Lucene.md) for documentation 
+## Examples of using the framework
+### Lucene.NET library [(link)](CacheIt.Lucene/CacheIt.Lucene.md) for documentation 
+* Creates a Directory provider based off of CacheIt chunk streams
