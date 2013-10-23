@@ -16,7 +16,7 @@ namespace CacheIt.IO
         private bool canSeek;
         private bool canWrite;
         private ChunkStreamHeader header;
-        private byte[] buffer;
+        private byte[] localBuffer;
         private ObjectCache cache;
         private string key;
         private string region;
@@ -37,7 +37,7 @@ namespace CacheIt.IO
             cache = objectCache;
             this.key = key;
             this.region = region;
-            buffer = new byte[bufferSize];
+            localBuffer = new byte[bufferSize];
 
             // create the header if it doesn't exist
             header = objectCache.Get(key, region, ()=>new ChunkStreamHeader(bufferSize));
@@ -134,7 +134,7 @@ namespace CacheIt.IO
         {   
             // generate the buffer key and save the current buffer
             var key = GenerateBufferKey(position);
-            cache.Set(key, buffer, region);
+            cache.Set(key, localBuffer, region);
 
             // save the file header as well
             SaveHeader();
@@ -222,10 +222,10 @@ namespace CacheIt.IO
             if (currentBufferKey != newBufferKey)
             {                
                 // save the current buffer
-                cache.Set(currentBufferKey, buffer, region);
+                cache.Set(currentBufferKey, localBuffer, region);
 
                 // get the new buffer
-                buffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
+                localBuffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
             }
 
             position = absoluteOffset;
@@ -281,7 +281,7 @@ namespace CacheIt.IO
                     : count - bytesRead;
 
                 // copy the bytes to the input buffer
-                Array.Copy(this.buffer, relativePosition, buffer, bytesRead + offset, relativeCount);
+                Array.Copy(this.localBuffer, relativePosition, buffer, bytesRead + offset, relativeCount);
 
                 // increment both the bytes read and the current position
                 bytesRead += relativeCount;
@@ -292,7 +292,7 @@ namespace CacheIt.IO
                 if (currentPosition < this.Header.Length)
                 {
                     string currentBufferKey = this.GenerateBufferKey(currentPosition);
-                    this.buffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
+                    this.localBuffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
                 }
                 else { break; }
             }
@@ -330,11 +330,11 @@ namespace CacheIt.IO
                 {
                     // save the previous buffer
                     string currentBufferKey = GenerateBufferKey(bufferIndex - 1);
-                    cache.Set(currentBufferKey, this.buffer, region);
+                    cache.Set(currentBufferKey, this.localBuffer, region);
 
                     // load the next buffer, creating it if necessary
                     currentBufferKey = GenerateBufferKey(bufferIndex);
-                    this.buffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
+                    this.localBuffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
                 }
 
                 // the relative position is where to start writing in the current buffer
@@ -349,7 +349,7 @@ namespace CacheIt.IO
                     : count - bytesWritten;
 
                 // copies bytes from the write buffer to the current buffer
-                Array.Copy(buffer, offset + bytesWritten, this.buffer, relativeOffset, relativeCount);
+                Array.Copy(buffer, offset + bytesWritten, this.localBuffer, relativeOffset, relativeCount);
 
                 // increment the counters
                 bytesWritten += relativeCount;
