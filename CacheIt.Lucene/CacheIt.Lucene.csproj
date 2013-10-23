@@ -54,6 +54,7 @@
     <Compile Include="Store\CacheOutputStream.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CacheIt.Lucene.md" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
