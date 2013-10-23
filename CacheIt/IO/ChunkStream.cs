@@ -257,19 +257,36 @@ namespace CacheIt.IO
                 throw new ArgumentOutOfRangeException("count is negative");
 
             // quick check to see if we are at the end of the stream
-            if (count + position > this.header.Length)
+            if (position > this.header.Length)
                 return 0;
             
-            int endBufferIndex = GetBufferIndex(position + count);
+            // set the actual count
+            int actualCount = count;
+            if (count > this.header.Length)
+                actualCount = (int)this.header.Length;
+
+            // setup some indicies, we are going to iterate through the stream using buffer chunks instead of individual
+            // byte addresses. 
+            int endBufferIndex = GetBufferIndex(position + actualCount);
             int startBufferIndex = GetBufferIndex(position);
             int bytesRead = 0;
 
             // for durability we will copy the position into a currentPosition variable
+            // the Stream class requires that the position not change if there is an error
             long currentPosition = position;
-
+                        
             // loops through the buffers between the current position and the target position
             for (int bufferIndex = startBufferIndex; bufferIndex <= endBufferIndex; bufferIndex++)
             {
+                // Do a clean read of the current buffer.
+                // Make sure we aren't at the end of the file so we don't allocate useless buffers.                
+                if (currentPosition < this.Header.Length)
+                {
+                    string currentBufferKey = this.GenerateBufferKey(currentPosition);
+                    this.localBuffer = this.localBuffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
+                }
+                else { break; }
+
                 // the relative position is where to start reading in the current buffer
                 int relativePosition = GetRelativeOffset(currentPosition, bufferIndex);
 
@@ -278,7 +295,7 @@ namespace CacheIt.IO
                 // otherwise set the relative count to the count - bytes read
                 int relativeCount = bufferIndex < endBufferIndex
                     ? this.Header.BufferSize - relativePosition
-                    : count - bytesRead;
+                    : actualCount - bytesRead;
 
                 // copy the bytes to the input buffer
                 Array.Copy(this.localBuffer, relativePosition, buffer, bytesRead + offset, relativeCount);
@@ -286,15 +303,6 @@ namespace CacheIt.IO
                 // increment both the bytes read and the current position
                 bytesRead += relativeCount;
                 currentPosition += relativeCount;
-
-                // do a quick bounds check, we want to make sure we aren't at the end of the file so we don't allocate
-                // useless buffers.
-                if (currentPosition < this.Header.Length)
-                {
-                    string currentBufferKey = this.GenerateBufferKey(currentPosition);
-                    this.localBuffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
-                }
-                else { break; }
             }
 
             // we can only increment the position when the operation completes successfully

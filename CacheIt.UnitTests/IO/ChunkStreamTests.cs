@@ -74,6 +74,33 @@ namespace CacheIt.UnitTests.IO
             Assert.AreEqual(0, bytesRead);
         }
 
+        [TestMethod]
+        public void Test_Read_Fetches_From_Cache()
+        {
+            byte[] buffer = new byte[1024];
+
+            string expected = "This is some test data to make sure that the logic for reading is correct.";
+            byte[] expectedBuffer = Encoding.ASCII.GetBytes(expected);
+            
+            Array.Copy(expectedBuffer, buffer, expectedBuffer.Length);
+
+            var chunkStreamHeader = new ChunkStreamHeader(1024);
+            chunkStreamHeader.Length = expectedBuffer.Length;
+
+            objectCache.Set(Key, chunkStreamHeader);
+            objectCache.Set(FirstRecordKey, buffer);
+
+            // I need to recreate the stream because it doesn't have the most current header information
+            stream = new ChunkStream(objectCache, Key);
+
+            string actual = string.Empty;
+            using (StreamReader streamReader = new StreamReader(stream))
+            {
+                actual = streamReader.ReadToEnd();
+            }
+            Assert.AreEqual(expected, actual);
+        }
+
         #endregion Read
 
         #region Seek
@@ -123,6 +150,42 @@ namespace CacheIt.UnitTests.IO
         }
 
         #endregion Seek
+
+        #region SetLength
+        
+        [TestMethod]
+        public void Test_SetLength_To_Zero_Removes_Items()
+        {
+            byte[] buffer = new byte[1024];
+
+            string expected = "This is some test data to make sure that the logic for reading is correct.";
+            byte[] expectedBuffer = Encoding.ASCII.GetBytes(expected);            
+
+            Array.Copy(expectedBuffer, buffer, expectedBuffer.Length);
+
+            var chunkStreamHeader = new ChunkStreamHeader(1024);
+            chunkStreamHeader.Length = expectedBuffer.Length;
+
+            objectCache.Set(Key, chunkStreamHeader);
+            objectCache.Set(FirstRecordKey, buffer);
+
+            // calculate the buffer count
+            int bufferCount = expectedBuffer.Length / chunkStreamHeader.BufferSize;
+
+            // I need to recreate the stream because it doesn't have the most current header information
+            stream = new ChunkStream(objectCache, Key);
+
+            // set the length to zero
+            stream.SetLength(0);
+
+            Assert.IsNotNull(objectCache.Get(Key));
+            for (int i = 0; i <= bufferCount; i++)
+            {
+                Assert.IsNull(objectCache.Get(string.Format("{0}_{1}", Key, i)));
+            }
+        }
+
+        #endregion SetLength
 
         #region Flush
 

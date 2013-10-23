@@ -180,12 +180,21 @@ namespace CacheIt.AppFabric
         /// <param name="item">The cache item to add.</param>
         /// <param name="policy">An object that contains eviction details for the cache entry. This object provides more options for eviction than a simple absolute expiration.</param>
         public override void Set(CacheItem item, CacheItemPolicy policy)
-        {
-            // need to convert policy to TimeSpan
-            if (item.RegionName == null)
-                cache.Put(item.Key, item, DateTime.Now - policy.AbsoluteExpiration.DateTime);
+        {   
+            if (policy.AbsoluteExpiration != ObjectCache.InfiniteAbsoluteExpiration)
+            {
+                if (item.RegionName == null)
+                    cache.Put(item.Key, item, policy.AbsoluteExpiration - DateTime.Now);
+                else
+                    cache.Put(item.Key, item, policy.AbsoluteExpiration - DateTime.Now, item.RegionName);            
+            }
             else
-                cache.Put(item.Key, item, DateTime.Now - policy.AbsoluteExpiration.DateTime, item.RegionName);            
+            {
+                if (item.RegionName == null)
+                    cache.Put(item.Key, item);
+                else
+                    cache.Put(item.Key, item, item.RegionName);   
+            }            
         }
     }
 }

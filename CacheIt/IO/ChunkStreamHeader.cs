@@ -8,6 +8,7 @@ namespace CacheIt.IO
     /// <summary>
     /// Defines a header for the chunk stream. The is the minimal information necessary to read the stream.
     /// </summary>
+    [Serializable]
     public class ChunkStreamHeader : IChunkStreamHeader
     {
         /// <summary>
