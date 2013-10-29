@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Lucene.Net.Store;
 using System.Runtime.Caching;
+using CacheIt.IO;
 
 namespace CacheIt.Lucene.Store
 {
@@ -13,24 +14,38 @@ namespace CacheIt.Lucene.Store
     public class CacheDirectory : Directory
     {
         private string directory;
+        private string region;
         private ObjectCache objectCache;
-        private ISet<string> files;
+        private IDictionary<string, CacheFile> files;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CacheDirectory"/> class.
+        /// </summary>
+        /// <param name="cache">The cache.</param>
+        /// <param name="directory">The directory.</param>
+        public CacheDirectory(ObjectCache cache, string directory)
+            : this(cache, directory, null)
+        { 
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CacheDirectory"/> class.
         /// </summary>
         /// <param name="directory">The directory.</param>
         /// <param name="cache">The cache.</param>
-        public CacheDirectory(string directory, ObjectCache cache) : base()
+        public CacheDirectory(ObjectCache cache, string directory, string region) : base()
         {            
             this.objectCache = cache;
             this.directory = directory;
+            this.region = region;
 
             // lets try with string lists
             // if this turns out to be inefficent, it may be beneficial to add a 
             // implementation specific list to CacheBase but I would prefer to avoid this
             // apprach at all costs.
-            this.files = objectCache.Get(directory, () => new HashSet<string>());
+            this.files = objectCache.Get(directory, () => new Dictionary<string, CacheFile>());
+
+            base.SetLockFactory(new CacheLockFactory(objectCache, string.Format("{0}_{1}", directory, "lock")));
         }
 
         /// <summary>
@@ -42,7 +57,8 @@ namespace CacheIt.Lucene.Store
         /// <exception cref="System.NotImplementedException"></exception>
         public override IndexOutput CreateOutput(string name)
         {
-            throw new NotImplementedException();
+            return new CacheOutputStream(
+                new ChunkStream(this.objectCache, GenerateFileKey(name), region));
         }
 
         /// <summary>
@@ -52,7 +68,7 @@ namespace CacheIt.Lucene.Store
         /// <exception cref="System.NotImplementedException"></exception>
         public override void DeleteFile(string name)
         {
-            throw new NotImplementedException();
+            this.objectCache.Remove(GenerateFileKey(name), region);
         }
 
         /// <summary>
@@ -62,7 +78,6 @@ namespace CacheIt.Lucene.Store
         /// <exception cref="System.NotImplementedException"></exception>
         protected override void Dispose(bool disposing)
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -73,7 +88,7 @@ namespace CacheIt.Lucene.Store
         /// <exception cref="System.NotImplementedException"></exception>
         public override bool FileExists(string name)
         {
-            throw new NotImplementedException();
+            return this.objectCache.Contains(GenerateFileKey(name), region);
         }
 
         /// <summary>
@@ -118,7 +133,8 @@ namespace CacheIt.Lucene.Store
         public override IndexInput OpenInput(string name)
         {
             this.EnsureOpen();
-            throw new NotImplementedException();
+            return new CacheInputStream(
+                new ChunkStream(this.objectCache, GenerateFileKey(name)));
         }
 
         /// <summary>
@@ -129,6 +145,11 @@ namespace CacheIt.Lucene.Store
         public override void TouchFile(string name)
         {
             throw new NotImplementedException();
+        }
+
+        protected virtual string GenerateFileKey(string name)
+        {
+            return string.Format("", directory, name);
         }
     }
 }

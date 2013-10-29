@@ -8,7 +8,7 @@ using System.Runtime.Caching;
 namespace CacheIt.Lucene.Store
 {
     /// <summary>
-    /// 
+    /// Creates a cache lock factory used to help maintain index integrity.
     /// </summary>
     public class CacheLockFactory : LockFactory
     {
