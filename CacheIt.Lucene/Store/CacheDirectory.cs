@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Lucene.Net.Store;
+using System.Runtime.Caching;
 
 namespace CacheIt.Lucene.Store
 {
@@ -11,6 +12,27 @@ namespace CacheIt.Lucene.Store
     /// </summary>
     public class CacheDirectory : Directory
     {
+        private string directory;
+        private ObjectCache objectCache;
+        private ISet<string> files;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CacheDirectory"/> class.
+        /// </summary>
+        /// <param name="directory">The directory.</param>
+        /// <param name="cache">The cache.</param>
+        public CacheDirectory(string directory, ObjectCache cache) : base()
+        {            
+            this.objectCache = cache;
+            this.directory = directory;
+
+            // lets try with string lists
+            // if this turns out to be inefficent, it may be beneficial to add a 
+            // implementation specific list to CacheBase but I would prefer to avoid this
+            // apprach at all costs.
+            this.files = objectCache.Get(directory, () => new HashSet<string>());
+        }
+
         /// <summary>
         /// Creates a new, empty file in the directory with the given name.
         /// Returns a stream writing this file.
@@ -83,7 +105,8 @@ namespace CacheIt.Lucene.Store
         /// <exception cref="System.NotImplementedException"></exception>
         public override string[] ListAll()
         {
-            throw new NotImplementedException();
+            // get a copy of the list
+            var files = this.objectCache.Get(directory);
         }
 
         /// <summary>
