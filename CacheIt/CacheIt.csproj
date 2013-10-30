@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="CacheBase.cs" />
     <Compile Include="CacheEntryChangeMonitorBase.cs" />
+    <Compile Include="Collections\PersistentSetAdapter.cs" />
     <Compile Include="Configuration\IGlobalConfiguration.cs" />
     <Compile Include="Diagnostics\Assert.cs" />
     <Compile Include="IO\ChunkStream.cs" />

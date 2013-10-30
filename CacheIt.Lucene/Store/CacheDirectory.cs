@@ -7,6 +7,7 @@ using Lucene.Net.Store;
 using CacheIt.IO;
 using System.IO;
 using Directory = Lucene.Net.Store.Directory;
+using CacheIt.Collections;
 
 namespace CacheIt.Lucene.Store
 {
@@ -20,6 +21,22 @@ namespace CacheIt.Lucene.Store
         private string region;
         private ObjectCache objectCache;
         private ISet<string> files;
+
+        private void AddFileToList(string fileName)
+        {
+            var set = this.objectCache.Get(directory) as ISet<string>;
+            if (set.Contains(fileName))
+                set.Add(fileName);
+            this.objectCache.Set(directory, set, region);
+        }
+
+        private void RemoveFileFromList(string fileName)
+        {
+            var set = this.objectCache.Get(directory) as ISet<string>;
+            if (set.Contains(fileName))
+                set.Remove(fileName);
+            this.objectCache.Set(directory, set, region);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CacheDirectory"/> class.
@@ -46,7 +63,8 @@ namespace CacheIt.Lucene.Store
             // if this turns out to be inefficent, it may be beneficial to add a 
             // implementation specific list to CacheBase but I would prefer to avoid this
             // apprach at all costs.
-            this.files = objectCache.Get(directory, () => new HashSet<string>());
+            var hashSet = objectCache.Get(directory, () => new HashSet<string>());
+            files = new PersistentSetAdapter<string>(hashSet, objectCache, directory, region);
 
             base.SetLockFactory(new CacheLockFactory(objectCache, string.Format("{0}_{1}", directory, "lock")));
         }
@@ -60,8 +78,33 @@ namespace CacheIt.Lucene.Store
         /// <exception cref="System.NotImplementedException"></exception>
         public override IndexOutput CreateOutput(string name)
         {
+            this.EnsureOpen();
+
+            // create the file key
+            var fileKey = GenerateFileKey(name);
+            
+            // attempt to get an existing object
+            CacheFile cacheFile = this.objectCache.Get(name, region) as CacheFile;
+
+            // if the object exists, completely remove the item
+            if (cacheFile != null)
+            {
+                DeleteFile(name);
+            }
+
+            // create a new instance of the cache file to be stored
+            cacheFile = new CacheFile
+            {
+                Identifier = Guid.NewGuid().ToString(),
+                LastModified = DateTimeOffset.UtcNow.Ticks / 10000L
+            };            
+
+            // set the cache file info under the file key
+            this.objectCache.Set(fileKey, cacheFile, region);            
+
+            // return the stream to the new file
             return new CacheOutputStream(
-                new ChunkStream(this.objectCache, GenerateFileKey(name), region));
+                new ChunkStream(this.objectCache, cacheFile.Identifier, region));
         }
 
         /// <summary>
@@ -81,11 +124,22 @@ namespace CacheIt.Lucene.Store
                 // get the data identifier and remove the data
                 string dataIdentifier = (cacheFile as CacheFile).Identifier;
                 if (!string.IsNullOrWhiteSpace(dataIdentifier))
-                    this.objectCache.Remove(dataIdentifier, region);
+                {
+                    // remove the data
+                    using (var stream = new ChunkStream(this.objectCache, dataIdentifier, region))
+                    {
+                        stream.SetLength(0);
+                    }
+                    // remove the stream info
+                    objectCache.Remove(dataIdentifier);
+                }
 
                 // remove the cache file last in case of exception
-                this.objectCache.Remove(fileKey, region);                
+                this.objectCache.Remove(fileKey, region);
             }
+            
+            // update the filesystem
+            this.RemoveFileFromList(name);
         }
 
         /// <summary>

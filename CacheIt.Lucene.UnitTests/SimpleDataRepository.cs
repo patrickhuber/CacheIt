@@ -25,8 +25,8 @@ namespace CacheIt.Lucene.UnitTests
         private static SimpleDataIndex simpleDataIndex;
 
         static SimpleDataRepository()
-        { 
-            var objectCache = new MemoryCache("Default");
+        {
+            var objectCache = new MemoryCache("{7D8DAD94-A0EF-4168-ACB5-2574DC000F26}");
             var cacheDirectory = new CacheDirectory(objectCache, "/path/to/directory");
             simpleDataIndex = new SimpleDataIndex(Items, cacheDirectory);
         }
