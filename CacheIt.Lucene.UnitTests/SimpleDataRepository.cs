@@ -8,6 +8,7 @@ using Lucene.Net.Documents;
 using Lucene.Net.Analysis.Standard;
 using Version = Lucene.Net.Util.Version;
 using Lucene.Net.Store;
+using System.Runtime.Caching;
 
 namespace CacheIt.Lucene.UnitTests
 {
@@ -36,7 +37,8 @@ namespace CacheIt.Lucene.UnitTests
 
         static SimpleDataRepository()
         {
-            var directory = new CacheIt.Lucene.Store.CacheDirectory();
+            var objectCache = new MemoryCache("Default");
+            var directory = new CacheIt.Lucene.Store.CacheDirectory(objectCache, "/path/to/directory");
 
         }
 

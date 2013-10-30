@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Store\CacheDirectory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Store\CacheFile.cs" />
     <Compile Include="Store\CacheInputStream.cs" />
     <Compile Include="Store\CacheLock.cs" />
     <Compile Include="Store\CacheLockFactory.cs" />

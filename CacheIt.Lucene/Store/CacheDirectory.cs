@@ -2,21 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Lucene.Net.Store;
 using System.Runtime.Caching;
+using Lucene.Net.Store;
 using CacheIt.IO;
+using System.IO;
+using Directory = Lucene.Net.Store.Directory;
 
 namespace CacheIt.Lucene.Store
 {
     /// <summary>
-    /// Creates a stream based directory
+    /// Defines a cache dictionary that contains files
+    /// <remarks>The cache directory is a container for files. The container holds a list of file names that are used to access CacheFile objects.</remarks>    
     /// </summary>
     public class CacheDirectory : Directory
     {
         private string directory;
         private string region;
         private ObjectCache objectCache;
-        private IDictionary<string, CacheFile> files;
+        private ISet<string> files;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CacheDirectory"/> class.
@@ -43,7 +46,7 @@ namespace CacheIt.Lucene.Store
             // if this turns out to be inefficent, it may be beneficial to add a 
             // implementation specific list to CacheBase but I would prefer to avoid this
             // apprach at all costs.
-            this.files = objectCache.Get(directory, () => new Dictionary<string, CacheFile>());
+            this.files = objectCache.Get(directory, () => new HashSet<string>());
 
             base.SetLockFactory(new CacheLockFactory(objectCache, string.Format("{0}_{1}", directory, "lock")));
         }
@@ -68,7 +71,21 @@ namespace CacheIt.Lucene.Store
         /// <exception cref="System.NotImplementedException"></exception>
         public override void DeleteFile(string name)
         {
-            this.objectCache.Remove(GenerateFileKey(name), region);
+            // get the file key and fetch the file info from the cache
+            var fileKey = GenerateFileKey(name);
+            var cacheFile = this.objectCache.Get(fileKey, region);
+
+            // not be null to continue
+            if (cacheFile != null)
+            {
+                // get the data identifier and remove the data
+                string dataIdentifier = (cacheFile as CacheFile).Identifier;
+                if (!string.IsNullOrWhiteSpace(dataIdentifier))
+                    this.objectCache.Remove(dataIdentifier, region);
+
+                // remove the cache file last in case of exception
+                this.objectCache.Remove(fileKey, region);                
+            }
         }
 
         /// <summary>
@@ -95,22 +112,42 @@ namespace CacheIt.Lucene.Store
         /// Returns the length of a file in the directory.
         /// </summary>
         /// <param name="name"></param>
-        /// <returns></returns>
-        /// <exception cref="System.NotImplementedException"></exception>
+        /// <returns>the length of the file</returns>        
         public override long FileLength(string name)
         {
-            throw new NotImplementedException();
+            var fileKey = GenerateFileKey(name);
+            var cacheFile = this.objectCache.Get(fileKey, region) as CacheFile;
+            
+            if (cacheFile == null)
+                throw new FileNotFoundException(
+                    string.Format(
+                        "Unable to find file {0} in directory {1}",
+                        name,
+                        directory));
+
+            using(var fileStream = new ChunkStream(this.objectCache, cacheFile.Identifier, region))
+            {
+                return fileStream.Length;
+            }
         }
 
         /// <summary>
         /// Returns the time the named file was last modified.
         /// </summary>
         /// <param name="name"></param>
-        /// <returns></returns>
+        /// <returns>the last modified date of the file</returns>
         /// <exception cref="System.NotImplementedException"></exception>
         public override long FileModified(string name)
         {
-            throw new NotImplementedException();
+            var fileKey = GenerateFileKey(name);
+            var cacheFile = this.objectCache.Get(fileKey, region);
+            if (cacheFile == null)
+                throw new FileNotFoundException(
+                    string.Format(
+                        "Unable to find file {0} in directory {1}",
+                        name,
+                        directory));
+            return (cacheFile as CacheFile).LastModified;
         }
 
         /// <summary>
@@ -121,7 +158,11 @@ namespace CacheIt.Lucene.Store
         public override string[] ListAll()
         {
             // get a copy of the list
-            var files = this.objectCache.Get(directory);
+            var files = this.objectCache.Get(directory, region) as HashSet<string>;
+            if (files == null)
+                throw new IOException(string.Format("Unable to enumerate files in directory {0}. File list is null.", directory));
+            return files.ToArray();
+
         }
 
         /// <summary>
@@ -134,7 +175,7 @@ namespace CacheIt.Lucene.Store
         {
             this.EnsureOpen();
             return new CacheInputStream(
-                new ChunkStream(this.objectCache, GenerateFileKey(name)));
+                new ChunkStream(this.objectCache, GenerateFileKey(name), region));
         }
 
         /// <summary>
@@ -144,12 +185,31 @@ namespace CacheIt.Lucene.Store
         /// <exception cref="System.NotImplementedException"></exception>
         public override void TouchFile(string name)
         {
-            throw new NotImplementedException();
+            var fileKey = GenerateFileKey(name);
+            var instance = this.objectCache.Get(fileKey, region);
+            if (instance == null)
+                throw new FileNotFoundException(
+                    string.Format(
+                        "Unable to find file {0} in directory {1}",
+                        name,
+                        directory));
+            var cacheFile = (instance as CacheFile);
+            
+            // set last modifed to the value used by Lucene RAM Directory
+            cacheFile.LastModified = DateTimeOffset.UtcNow.Ticks / 10000L;
+
+            // save the object back to the cache
+            this.objectCache.Set(fileKey, cacheFile, region);
         }
 
+        /// <summary>
+        /// Generates the file key.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns></returns>
         protected virtual string GenerateFileKey(string name)
         {
-            return string.Format("", directory, name);
+            return System.IO.Path.Combine(directory, name);
         }
     }
 }

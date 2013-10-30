@@ -6,7 +6,7 @@ using System.Text;
 namespace CacheIt.Lucene.Store
 {
     /// <summary>
-    /// Represents a cache file object used to store metadata about a file
+    /// Represents a cache file object used to store metadata about a file. Similar to INodes in the unix file system.
     /// </summary>
     public class CacheFile
     {
@@ -19,19 +19,11 @@ namespace CacheIt.Lucene.Store
         public long LastModified { get; set; }
 
         /// <summary>
-        /// Gets or sets the length.
+        /// Gets or sets the identifier.
         /// </summary>
         /// <value>
-        /// The length.
+        /// The identifier.
         /// </value>
-        public long Length { get; set; }
-
-        /// <summary>
-        /// Gets or sets the size information bytes.
-        /// </summary>
-        /// <value>
-        /// The size information bytes.
-        /// </value>
-        public long SizeInBytes { get; set; }
+        public string Identifier { get; set; }
     }
 }
