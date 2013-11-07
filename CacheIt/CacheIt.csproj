@@ -46,6 +46,8 @@
     <Compile Include="Collections\PersistentSetAdapter.cs" />
     <Compile Include="Configuration\IGlobalConfiguration.cs" />
     <Compile Include="Diagnostics\Assert.cs" />
+    <Compile Include="Interception\DependencyResolver.cs" />
+    <Compile Include="Interception\IDependencyResolver.cs" />
     <Compile Include="IO\ChunkStream.cs" />
     <Compile Include="IO\ChunkStreamHeader.cs" />
     <Compile Include="IO\IChunkStreamHeader.cs" />
