@@ -51,6 +51,7 @@
     <Compile Include="IO\ChunkStream.cs" />
     <Compile Include="IO\ChunkStreamHeader.cs" />
     <Compile Include="IO\IChunkStreamHeader.cs" />
+    <Compile Include="IO\IStreamFactory.cs" />
     <Compile Include="ObjectCacheExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Diagnostics\Strings.Designer.cs">
