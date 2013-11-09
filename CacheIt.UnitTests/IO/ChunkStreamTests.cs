@@ -176,7 +176,7 @@ namespace CacheIt.UnitTests.IO
             stream = new ChunkStream(objectCache, Key);
 
             // set the length to zero
-            stream.SetLength(0);
+            stream.SetLength(0);            
 
             Assert.IsNotNull(objectCache.Get(Key));
             for (int i = 0; i <= bufferCount; i++)
@@ -192,10 +192,21 @@ namespace CacheIt.UnitTests.IO
         [TestMethod]
         public void Test_Flush_Creates_New_Record()
         {
+            stream.SetLength(1);
             stream.Flush();
             Assert.AreEqual(0, stream.Position);
             Assert.IsTrue(objectCache.Contains(Key));
             Assert.IsTrue(objectCache.Contains(FirstRecordKey));
+        }
+
+        [TestMethod]
+        public void Test_Flush_Zero_Length_Does_Not_Create_Record()
+        {
+            stream.SetLength(0);
+            stream.Flush();
+            Assert.AreEqual(0, stream.Position);
+            Assert.IsTrue(objectCache.Contains(Key));
+            Assert.IsFalse(objectCache.Contains(FirstRecordKey));
         }
 
         #endregion Flush

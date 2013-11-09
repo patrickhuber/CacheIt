@@ -8,6 +8,7 @@ using CacheIt.IO;
 using System.IO;
 using Directory = Lucene.Net.Store.Directory;
 using CacheIt.Collections;
+using System.Diagnostics;
 
 namespace CacheIt.Lucene.Store
 {
@@ -47,7 +48,7 @@ namespace CacheIt.Lucene.Store
             // if this turns out to be inefficent, it may be beneficial to add a 
             // implementation specific list to CacheBase but I would prefer to avoid this
             // apprach at all costs.
-            var hashSet = objectCache.Get(directory, () => new HashSet<string>());
+            var hashSet = objectCache.Get(directory, region,() => new HashSet<string>());
             files = new PersistentSetAdapter<string>(hashSet, objectCache, directory, region);
 
             base.SetLockFactory(new CacheLockFactory(objectCache, string.Format("{0}_{1}", directory, "lock")));
@@ -86,6 +87,11 @@ namespace CacheIt.Lucene.Store
             // set the cache file info under the file key
             this.objectCache.Set(fileKey, cacheFile, region);            
 
+            // update the filesystem
+            this.files.Add(name);
+
+            Trace.WriteLine(string.Format("File {0} created", name));
+
             // return the stream to the new file
             return new CacheOutputStream(
                 new ChunkStream(this.objectCache, cacheFile.Identifier, region));
@@ -115,7 +121,7 @@ namespace CacheIt.Lucene.Store
                         stream.SetLength(0);
                     }
                     // remove the stream info
-                    objectCache.Remove(dataIdentifier);
+                    objectCache.Remove(dataIdentifier, region);
                 }
 
                 // remove the cache file last in case of exception
@@ -124,6 +130,8 @@ namespace CacheIt.Lucene.Store
             
             // update the filesystem
             this.files.Remove(name);
+            
+            Trace.WriteLine(string.Format("File {0} deleted", name));
         }
 
         /// <summary>
@@ -142,8 +150,10 @@ namespace CacheIt.Lucene.Store
         /// <returns></returns>
         /// <exception cref="System.NotImplementedException"></exception>
         public override bool FileExists(string name)
-        {
-            return this.objectCache.Contains(GenerateFileKey(name), region);
+        {            
+            bool result = this.objectCache.Contains(GenerateFileKey(name), region);
+            Trace.WriteLine(string.Format("File {0} does {1}exist", name, result ? string.Empty : "not "));
+            return result;
         }
 
         /// <summary>
@@ -183,12 +193,16 @@ namespace CacheIt.Lucene.Store
         /// <exception cref="System.NotImplementedException"></exception>
         public override string[] ListAll()
         {
-            // get a copy of the list
-            var files = this.objectCache.Get(directory, region) as HashSet<string>;
+            // check if the file list is null
             if (files == null)
                 throw new IOException(string.Format("Unable to enumerate files in directory {0}. File list is null.", directory));
-            return files.ToArray();
 
+            // get a copy of the list
+            var copyOfFiles = new HashSet<string>(this.files);
+            
+            Trace.WriteLine(string.Format("ListAll called with {0} files.", copyOfFiles.Count));
+
+            return copyOfFiles.ToArray();
         }
 
         /// <summary>
@@ -206,6 +220,8 @@ namespace CacheIt.Lucene.Store
             
             // create a chunk stream with the cache file identifier
             var chunkStream = new ChunkStream(this.objectCache, cacheFile.Identifier, region);
+
+            Trace.WriteLine(string.Format("{0} open for read", name));
 
             // return a new cache input stream from the chunk stream.
             return new CacheInputStream(chunkStream);

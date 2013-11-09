@@ -131,10 +131,15 @@ namespace CacheIt.IO
         /// </summary>
         /// <exception cref="System.NotImplementedException"></exception>
         public override void Flush()
-        {   
-            // generate the buffer key and save the current buffer
-            var key = GenerateBufferKey(position);
-            cache.Set(key, localBuffer, region);
+        {
+            // if the header length is zero, don't save the buffer as we need a way to cleanup
+            // files using streams.
+            if (Length > 0)
+            {
+                // generate the buffer key and save the current buffer
+                var key = GenerateBufferKey(position);
+                cache.Set(key, localBuffer, region);
+            }
 
             // save the file header as well
             SaveHeader();
@@ -157,7 +162,7 @@ namespace CacheIt.IO
                 for (int bufferIndex = valueIndex; bufferIndex <= tailBufferIndex; bufferIndex++)
                 {
                     // remove the buffers from the cache
-                    cache.Remove(GenerateBufferKey(bufferIndex));
+                    cache.Remove(GenerateBufferKey(bufferIndex), region);
                 }
             }
 
@@ -283,7 +288,7 @@ namespace CacheIt.IO
                 if (currentPosition < this.Header.Length)
                 {
                     string currentBufferKey = this.GenerateBufferKey(currentPosition);
-                    this.localBuffer = this.localBuffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
+                    this.localBuffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
                 }
                 else { break; }
 
