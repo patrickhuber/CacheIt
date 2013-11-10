@@ -49,6 +49,7 @@ namespace CacheIt.UnitTests.IO
 
         #endregion  TestContext
 
+        #region Write 
         [TestMethod]
         public void Test_Write_Large_Array()
         {            
@@ -103,6 +104,26 @@ namespace CacheIt.UnitTests.IO
             bytes = cache.Get(segmentService.GenerateSegmentKey(1, Key)) as byte[];
             Assert.IsNull(bytes);
         }
+
+        #endregion Write
+
+        #region Length
+        [TestMethod]
+        public void Test_Length_Updates_After_Write_And_Flush()
+        {
+            byte[] buffer = Encoding.ASCII.GetBytes(new string('a', 1024));
+            stream.Write(buffer, 0, buffer.Length);
+            Assert.AreEqual((long)buffer.Length, stream.Length);
+        }
+
+        [TestMethod]
+        public void Test_Length_Updates_After_Small_Write()
+        {
+            byte[] buffer = Encoding.ASCII.GetBytes(new string('a', 10));
+            stream.Write(buffer, 0, buffer.Length);
+            Assert.AreEqual((long)buffer.Length, stream.Length);
+        }
+        #endregion Length
 
         private void AssertAreEqual(byte[] expected, int offset)
         {

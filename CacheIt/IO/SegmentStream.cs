@@ -22,7 +22,6 @@ namespace CacheIt.IO
         private bool _canWrite;
         private readonly int _segmentSize;
         private byte[] _segment;
-        private long _segmentPosition;
         private int _readPosition;
         private int _readLength;
         // the position within the current buffer of a write
@@ -117,9 +116,20 @@ namespace CacheIt.IO
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// When overridden in a derived class, gets the length in bytes of the stream.
+        /// </summary>
+        /// <returns>A long value representing the length of the stream in bytes.</returns>
         public override long Length
         {
-            get { throw new NotImplementedException(); }
+            get 
+            {
+                SegmentStreamHeader header = GetHeader();
+                long fileSize = header.Length;
+                if (_writePosition > 0 && _position + _writePosition > fileSize)
+                    fileSize = _writePosition + _position;
+                return fileSize;
+            }
         }
 
         /// <summary>
@@ -319,6 +329,12 @@ namespace CacheIt.IO
             }
             
             _position += count;
+            var header = GetHeader();
+            if (_position > header.Length)
+            {
+                header.Length = _position;
+                _cache.Set(Key, header, Region);
+            }
         }
     }
 }
