@@ -209,6 +209,25 @@ namespace CacheIt.UnitTests.IO
             Assert.IsFalse(objectCache.Contains(FirstRecordKey));
         }
 
+        [TestMethod]
+        public void Test_Flush_Before_Read_Preserves_Contents()
+        {
+            string testString = "this is a test that will check if we are truncating the file on arbitrary reads.";
+            byte[] encodedString = Encoding.ASCII.GetBytes(testString);
+            stream.Write(encodedString, 0, encodedString.Length);
+            stream.Flush();
+
+            using (var testStream = new CacheIt.IO.ChunkStream(objectCache, Key))
+            {
+                Assert.AreNotEqual(0, testStream.Length);
+            }
+
+            stream = new CacheIt.IO.ChunkStream(objectCache, Key);
+            stream.Read(encodedString, 0, encodedString.Length);
+            var actualString = Encoding.ASCII.GetString(encodedString);
+            Assert.AreEqual(testString, actualString);
+        }
+
         #endregion Flush
 
         #region Write

@@ -79,5 +79,46 @@ namespace CacheIt.Diagnostics
             if (array == null || !array.Any())
                 throw new Exception(message);
         }
+
+        /// <summary>
+        /// Determines whether the specified value is false.
+        /// </summary>
+        /// <param name="value">if set to <c>true</c> [value].</param>
+        public static void IsFalse(bool value)
+        {
+            IsFalse(value, "value must be false.");
+        }
+
+        /// <summary>
+        /// Determines whether the specified value is false.
+        /// </summary>
+        /// <param name="value">if set to <c>true</c> [value].</param>
+        /// <param name="message">The message.</param>
+        /// <exception cref="System.Exception"></exception>
+        public static void IsFalse(bool value, string message)
+        {
+            if (value)
+                throw new Exception(message);
+        }
+
+        /// <summary>
+        /// Determines whether the specified value is true.
+        /// </summary>
+        /// <param name="value">if set to <c>true</c> [value].</param>
+        public static void IsTrue(bool value)
+        {
+            IsTrue(value, "value must be true.");
+        }
+
+        /// <summary>
+        /// Determines whether the specified value is true.
+        /// </summary>
+        /// <param name="value">if set to <c>true</c> [value].</param>
+        /// <exception cref="System.Exception">value must be true.</exception>
+        public static void IsTrue(bool value, string message)
+        {
+            if (!value)
+                throw new Exception(message);
+        }
     }
 }

@@ -40,7 +40,7 @@ namespace CacheIt.IO
             localBuffer = new byte[bufferSize];
 
             // create the header if it doesn't exist
-            header = objectCache.Get(key, region, ()=>new ChunkStreamHeader(bufferSize));
+            header = objectCache.Get(key, ()=>new ChunkStreamHeader(bufferSize), region);
 
             canRead = true;
             canSeek = true;
@@ -134,7 +134,7 @@ namespace CacheIt.IO
         {
             // if the header length is zero, don't save the buffer as we need a way to cleanup
             // files using streams.
-            if (Length > 0)
+            if (Length > 0 && Position > 0)
             {
                 // generate the buffer key and save the current buffer
                 var key = GenerateBufferKey(position);
@@ -230,7 +230,7 @@ namespace CacheIt.IO
                 cache.Set(currentBufferKey, localBuffer, region);
 
                 // get the new buffer
-                localBuffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
+                localBuffer = cache.Get(currentBufferKey, () => new byte[this.Header.BufferSize], region);
             }
 
             position = absoluteOffset;
@@ -288,7 +288,7 @@ namespace CacheIt.IO
                 if (currentPosition < this.Header.Length)
                 {
                     string currentBufferKey = this.GenerateBufferKey(currentPosition);
-                    this.localBuffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
+                    this.localBuffer = cache.Get(currentBufferKey, () => new byte[this.Header.BufferSize], region);
                 }
                 else { break; }
 
@@ -347,7 +347,7 @@ namespace CacheIt.IO
 
                     // load the next buffer, creating it if necessary
                     currentBufferKey = GenerateBufferKey(bufferIndex);
-                    this.localBuffer = cache.Get(currentBufferKey, region, () => new byte[this.Header.BufferSize]);
+                    this.localBuffer = cache.Get(currentBufferKey, () => new byte[this.Header.BufferSize], region);
                 }
 
                 // the relative position is where to start writing in the current buffer

@@ -48,7 +48,7 @@ namespace CacheIt.Lucene.Store
             // if this turns out to be inefficent, it may be beneficial to add a 
             // implementation specific list to CacheBase but I would prefer to avoid this
             // apprach at all costs.
-            var hashSet = objectCache.Get(directory, region,() => new HashSet<string>());
+            var hashSet = objectCache.Get(directory, () => new HashSet<string>(), region);
             files = new PersistentSetAdapter<string>(hashSet, objectCache, directory, region);
 
             base.SetLockFactory(new CacheLockFactory(objectCache, string.Format("{0}_{1}", directory, "lock")));

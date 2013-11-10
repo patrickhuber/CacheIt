@@ -133,6 +133,57 @@ namespace CacheIt.Lucene.UnitTests
             { }
         }
 
+        [Ignore]
+        public void Test_FileSystem_Files_Match_Cache_Files()
+        {
+            // create the cache index
+            Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
+            IndexWriter indexWriter = new IndexWriter(directory, analyzer, true, new IndexWriter.MaxFieldLength(25000));
+            Document document = new Document();
+            string text = "This is the text to be indexed.";
+            document.Add(new Field("fieldname", text, Field.Store.YES, Field.Index.ANALYZED));
+            indexWriter.AddDocument(document);
+            indexWriter.Dispose();
+
+            // create the filesystem index
+            string fileSystemDirectory = @"C:\x\cacheit";
+            if(System.IO.Directory.Exists(fileSystemDirectory))
+                System.IO.Directory.Delete(fileSystemDirectory, true);
+            var fsDirectory = FSDirectory.Open(fileSystemDirectory);
+            indexWriter = new IndexWriter(fsDirectory, analyzer, true, new IndexWriter.MaxFieldLength(25000));
+            document = new Document();
+            document.Add(new Field("fieldname", text, Field.Store.YES, Field.Index.ANALYZED));
+            indexWriter.AddDocument(document);
+            indexWriter.Dispose();
+
+            var cacheFiles = directory.ListAll().OrderBy(x=>x).ToArray();
+            var fileSystemFiles = fsDirectory.ListAll().OrderBy(x=>x).ToArray();
+
+            // make sure the file counts match
+            Assert.AreEqual(cacheFiles.Length, fileSystemFiles.Length);
+
+            for (int i = 0; i < cacheFiles.Length; i++)
+            {
+                Assert.AreEqual(cacheFiles[i], fileSystemFiles[i]);
+                string name = cacheFiles[i];
+                var cacheFileStream = directory.OpenInput(name);
+                var fsFileStream = fsDirectory.OpenInput(name);
+                Assert.AreEqual(cacheFileStream.Length(), fsFileStream.Length());
+                int length = Convert.ToInt32(fsFileStream.Length());
+                byte[] cacheBuffer = new byte[length];
+                byte[] fsBuffer = new byte[length];
+
+                cacheFileStream.ReadBytes(cacheBuffer, 0, cacheBuffer.Length);
+                fsFileStream.ReadBytes(fsBuffer, 0, fsBuffer.Length);
+
+                for (int b = 0; b < cacheBuffer.Length; b++)
+                {
+                    Assert.AreEqual(cacheBuffer[b], fsBuffer[b], 
+                        string.Format("File {0} byte {1} expected {2} actual {3}", name, b, fsBuffer[b], cacheBuffer[b]));
+                }
+            }
+        }
+
         [TestMethod]
         public void Test_Create_And_Read_Index()
         {

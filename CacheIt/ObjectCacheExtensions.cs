@@ -11,13 +11,15 @@ namespace CacheIt
         /// <summary>
         /// Gets an item in the cache. If the item does not exist, the item is placed in the cache.
         /// </summary>
-        /// <param name="dataCache">The data cache.</param>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="objectCache">The data cache.</param>
         /// <param name="key">The key.</param>
-        /// <param name="region">The region.</param>
         /// <param name="resolver">The resolver.</param>
+        /// <param name="region">The region.</param>
         /// <returns></returns>
-        public static T Get<T>(this ObjectCache objectCache, string key, string region, Func<T> resolver)
+        public static T Get<T>(this ObjectCache objectCache, string key, Func<T> resolver, string region = null)
         {
+
             T value = default(T);
             var cacheItem = string.IsNullOrWhiteSpace(region)
                 ? objectCache.GetCacheItem(key)
@@ -25,7 +27,7 @@ namespace CacheIt
 
             if (cacheItem == null)
             {
-                value = resolver();                      
+                value = resolver();
                 objectCache.Set(key, value, ObjectCache.InfiniteAbsoluteExpiration, region);
             }
             else
@@ -33,18 +35,6 @@ namespace CacheIt
                 value = (T)cacheItem.Value;
             }
             return value;
-        }
-
-        /// <summary>
-        /// Gets an item in the cache. If the item does not exist, the item is placed in the cache.
-        /// </summary>
-        /// <param name="objectCache">The data cache.</param>
-        /// <param name="key">The key.</param>
-        /// <param name="resolver">The resolver.</param>
-        /// <returns></returns>
-        public static T Get<T>(this ObjectCache objectCache, string key, Func<T> resolver)
-        {
-            return objectCache.Get(key, null, resolver);
         }
 
         /// <summary>
