@@ -54,13 +54,8 @@ namespace CacheIt.UnitTests.IO
         {            
             var bytes = Encoding.ASCII.GetBytes(LoremIpsum.ThreeThousandSixtyNineCharacter);
             stream.Write(bytes, 0, bytes.Length);
-            
-            for(int index = 0;index < bytes.Length;index+=BufferSize)
-            {
-                int segmentIndex = segmentService.GetSegmentIndex(index, BufferSize);
-                var buffer = cache.Get(segmentService.GenerateSegmentKey(segmentIndex, Key));
-                Assert.IsNotNull(buffer);
-            }
+
+            AssertAreEqual(bytes, 0);
         }
 
         [TestMethod]
@@ -71,6 +66,22 @@ namespace CacheIt.UnitTests.IO
             var secondSegment = Encoding.ASCII.GetBytes(twoThousandCharacters);
             stream.Write(firstSegment, 0, firstSegment.Length);
             stream.Write(secondSegment, 0, secondSegment.Length);
+            AssertAreEqual(firstSegment, 0);
+            AssertAreEqual(secondSegment, firstSegment.Length);
+        }
+
+        private void AssertAreEqual(byte[] expected, int offset)
+        {
+            for (int index = offset; index < expected.Length; index += BufferSize)
+            {
+                int segmentIndex = segmentService.GetSegmentIndex(index, BufferSize);
+                var buffer = cache.Get(segmentService.GenerateSegmentKey(segmentIndex, Key)) as byte[];
+                Assert.IsNotNull(buffer);
+                for (int b = 0; b < buffer.Length && index * BufferSize + b < expected.Length; b++)
+                {
+                    Assert.AreEqual(buffer[b], expected[index * BufferSize + b]);
+                }
+            }
         }
     }
 }

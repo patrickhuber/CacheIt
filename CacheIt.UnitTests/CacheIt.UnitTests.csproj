@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Diagnostics\AssertTest.cs" />
+    <Compile Include="IO\SegmentServiceTests.cs" />
     <Compile Include="IO\SegmentStreamTests.cs" />
     <Compile Include="IO\ChunkStreamTests.cs" />
     <Compile Include="LoremIpsum.cs" />
