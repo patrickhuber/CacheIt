@@ -70,6 +70,40 @@ namespace CacheIt.UnitTests.IO
             AssertAreEqual(secondSegment, firstSegment.Length);
         }
 
+        [TestMethod]
+        public void Test_Write_Small_Segments_Requires_Flush()
+        {
+            string[] array = { "what", "does", "the", "fox", "say" };
+            foreach (var item in array)
+            {
+                var buffer = Encoding.ASCII.GetBytes(item);
+                stream.Write(buffer, 0, buffer.Length);
+                stream.WriteByte((byte)' ');
+            }
+
+            byte[] bytes = cache.Get(segmentService.GenerateSegmentKey(0, Key)) as byte[];
+            Assert.IsNull(bytes);
+        }
+
+        [TestMethod]
+        public void Test_Write_Small_Segments_Totaling_Buffer_Size_Auto_Flushes()
+        {
+            string message = LoremIpsum.OneThousandCharacters + " I only need 24 extra characters this is 43";
+            string[] array = message.Split(' ');
+            int bytesWritten = 0;
+            foreach (var item in array)
+            {
+                var buffer = Encoding.ASCII.GetBytes(item);
+                stream.Write(buffer, 0, buffer.Length);
+                stream.WriteByte((byte)' ');
+                bytesWritten += buffer.Length + 1;
+            }
+            byte[] bytes = cache.Get(segmentService.GenerateSegmentKey(0, Key)) as byte[];
+            Assert.IsNotNull(bytes);
+            bytes = cache.Get(segmentService.GenerateSegmentKey(1, Key)) as byte[];
+            Assert.IsNull(bytes);
+        }
+
         private void AssertAreEqual(byte[] expected, int offset)
         {
             for (int index = offset; index < expected.Length; index += BufferSize)

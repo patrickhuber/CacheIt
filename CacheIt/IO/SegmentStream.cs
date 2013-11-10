@@ -8,6 +8,9 @@ using System.Text;
 
 namespace CacheIt.IO
 {
+    /// <summary>
+    /// A buffered segment stream that is based off of the .NET 4.0 FileStream buffered read/write approach.
+    /// </summary>
     public class SegmentStream : Stream
     {
         private ObjectCache _cache;
@@ -117,6 +120,15 @@ namespace CacheIt.IO
         public override long Length
         {
             get { throw new NotImplementedException(); }
+        }
+
+        /// <summary>
+        /// Gets the header.
+        /// </summary>
+        /// <returns></returns>
+        private SegmentStreamHeader GetHeader()
+        {
+            return _cache.Get<SegmentStreamHeader>(Key, () => new SegmentStreamHeader(_segmentSize), _regionKey.Region);
         }
 
         public override long Position
@@ -243,6 +255,31 @@ namespace CacheIt.IO
         }
 
         /// <summary>
+        /// Writes a byte to the current position in the stream and advances the position within the stream by one byte.
+        /// </summary>
+        /// <param name="value">The byte to write to the stream.</param>
+        public override void WriteByte(byte value)
+        {
+            if (_writePosition == 0)
+            {
+                if (!this.CanWrite)
+                    throw new InvalidOperationException("Write is not supported while disposing.");
+                if (_readPosition < _readLength)
+                    FlushRead();
+                _readPosition = 0;
+                _readLength = 0;
+                if (_segment == null)
+                    _segment = new byte[_segmentSize];                                    
+            }
+            if (_writePosition == _segmentSize)
+            {
+                FlushWrite(false);
+            }
+            _segment[_writePosition] = value;
+            _writePosition++;
+        }
+
+        /// <summary>
         /// Takes an array an splits the array into segments writing each to the cache
         /// </summary>
         /// <param name="array">The array.</param>
@@ -260,21 +297,25 @@ namespace CacheIt.IO
             {
                 // create the segment key
                 string segmentKey = _segmentService.GenerateSegmentKey(segmentIndex, _regionKey.Key);
-                
-                // fetch or create the segment in the cache
-                var segment = _cache.Get<byte[]>(segmentKey, () => new byte[_segmentSize], _regionKey.Region);
 
                 // with the segment position we know where to start writing in the current segment
-                var segmentPosition = _segmentService.GetPositionInSegment(bytesWritten + _position, segment.Length);
+                var segmentPosition = _segmentService.GetPositionInSegment(bytesWritten + _position, _segmentSize);
 
                 // calculate the byte count 
-                var byteCount = segment.Length - segmentPosition;
+                var byteCount = _segmentSize - segmentPosition;
                 if (count - bytesWritten < byteCount)
                     byteCount = count - bytesWritten;
 
-                System.Array.Copy(array, offset + bytesWritten, segment, segmentPosition, byteCount);
-                bytesWritten += byteCount;
-                _cache.Set(segmentKey, segment, _regionKey.Region);
+                // if we have bytes to write, write the bytes
+                if (byteCount > 0)
+                {
+                    // fetch or create the segment in the cache
+                    var segment = _cache.Get<byte[]>(segmentKey, () => new byte[_segmentSize], _regionKey.Region);
+
+                    System.Array.Copy(array, offset + bytesWritten, segment, segmentPosition, byteCount);
+                    bytesWritten += byteCount;
+                    _cache.Set(segmentKey, segment, _regionKey.Region);
+                }
             }
             
             _position += count;

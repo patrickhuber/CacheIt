@@ -59,5 +59,14 @@ namespace CacheIt.UnitTests.IO
             actual = segmentService.GetPositionInSegment(2048, 1024);
             Assert.AreEqual(0, actual);
         }
+
+        [TestMethod]
+        public void Test_GetSegmentIndex()
+        {
+            int actual = segmentService.GetSegmentIndex(0, 1024);
+            Assert.AreEqual(0, actual);
+            actual = segmentService.GetSegmentIndex(1025, 1024);
+            Assert.AreEqual(1, actual);
+        }
     }
 }
