@@ -235,7 +235,7 @@ namespace CacheIt.UnitTests.IO
         [TestMethod]
         public void Test_Write_Creates_New_Record()
         {
-            byte[] textBytes = ASCIIEncoding.ASCII.GetBytes(LoremIpsum.OneThousandCharacters + LoremIpsum.OneHundredFourtyCharacters);
+            byte[] textBytes = ASCIIEncoding.ASCII.GetBytes(LoremIpsum.ThreeThousandSixtyNineCharacter + LoremIpsum.OneHundredFourtyCharacters);
             byte[] bytes = new byte[2000];
             Array.Copy(textBytes, bytes, 2000);
 

@@ -8,31 +8,73 @@ using System.Text;
 
 namespace CacheIt.IO
 {
-    public class BufferedStream : Stream
+    public class SegmentStream : Stream
     {
         private ObjectCache _cache;
         private RegionKey _regionKey;
+        private ISegmentService _segmentService;
 
         private bool _canRead;
         private bool _canSeek;
         private bool _canWrite;
-        private readonly int _bufferSize;
-        private byte[] _buffer;
-        private long _bufferPosition;
+        private readonly int _segmentSize;
+        private byte[] _segment;
+        private long _segmentPosition;
         private int _readPosition;
         private int _readLength;
         // the position within the current buffer of a write
         private int _writePosition;
         private long _position;
 
-        public BufferedStream(ObjectCache objectCache, string key, string region, int bufferSize)
+        public const int DefaultSegmentSize = 1024;
+        public const string DefaultRegion = null;
+
+        /// <summary>
+        /// Gets the key.
+        /// </summary>
+        /// <value>
+        /// The key.
+        /// </value>
+        public string Key { get { return String.Copy(_regionKey.Key); } }
+
+        /// <summary>
+        /// Gets the region.
+        /// </summary>
+        /// <value>
+        /// The region.
+        /// </value>
+        public string Region { get { return _regionKey.Region != null ? String.Copy(_regionKey.Region) : null; } }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SegmentStream"/> class.
+        /// </summary>
+        /// <param name="objectCache">The object cache.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="segmentSize">Size of the segment.</param>
+        /// <param name="region">The region.</param>
+        public SegmentStream(ObjectCache objectCache, string key, int segmentSize = DefaultSegmentSize, string region = DefaultRegion)
+            : this(objectCache, key, new SegmentService(), segmentSize, region)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SegmentStream"/> class.
+        /// </summary>
+        /// <param name="objectCache">The object cache.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="region">The region.</param>
+        /// <param name="segmentSize">Size of the buffer.</param>
+        public SegmentStream(ObjectCache objectCache, string key, ISegmentService segmentService, int segmentSize = DefaultSegmentSize, string region = DefaultRegion)
         {
-            _buffer = new byte[bufferSize];
-            _bufferSize = bufferSize;
+            _segment = new byte[segmentSize];
+            _segmentSize = segmentSize;
             _cache = objectCache;
             _regionKey = new RegionKey { Key = key, Region = region };
+            _canRead = true;
+            _canWrite = true;
+            _canSeek = true;
+            _segmentService = segmentService;
         }
-
+        
         public override bool CanRead
         {
             get { return _canRead; }
@@ -50,7 +92,7 @@ namespace CacheIt.IO
 
         private void FlushWrite(bool calledFromFinalizer)
         {
-            this.WriteCore(this._buffer, 0, this._writePosition);
+            this.WriteCore(this._segment, 0, this._writePosition);
             this._writePosition = 0;
         }
         
@@ -137,7 +179,7 @@ namespace CacheIt.IO
             Assert.IsNotNull(array, "Array cannot be null.");
             Assert.IsTrue(offset >= 0, "Offset cannot be less than zero.");
             Assert.IsTrue(count >= 0, "Count cannot be less than zero.");
-            Assert.IsTrue(array.Length - offset >= count, "Invalid array size. Count + Offset cannot be greater than the array length.");
+            Assert.IsFalse(array.Length - offset < count, "Invalid array size. Count + Offset cannot be greater than the array length.");
 
             // write is starting the beginning of a segment
             if (_writePosition == 0)
@@ -154,7 +196,7 @@ namespace CacheIt.IO
             if (_writePosition > 0)
             {
                 // get the number of bytes we can write
-                int byteCount = _bufferSize - _writePosition;
+                int byteCount = _segmentSize - _writePosition;
 
                 // if the byte count is greater than the total count
                 // we will write the total count
@@ -162,7 +204,7 @@ namespace CacheIt.IO
                     byteCount = count;
 
                 // copy the input bytes to our buffer
-                Array.Copy(array, offset, _buffer, _writePosition, byteCount);
+                Array.Copy(array, offset, _segment, _writePosition, byteCount);
                 _writePosition += byteCount;
 
                 // we have written all of the bytes
@@ -174,11 +216,11 @@ namespace CacheIt.IO
                 offset += byteCount;
                 count -= byteCount;
 
-                this.WriteCore(_buffer, 0, _writePosition);
+                this.WriteCore(_segment, 0, _writePosition);
                 _writePosition = 0;
             }
 
-            if (count >= _bufferSize)
+            if (count >= _segmentSize)
             {
                 WriteCore(array, offset, count);
             }
@@ -189,11 +231,11 @@ namespace CacheIt.IO
                     return;
 
                 // allocate the buffer if it does not exist
-                if (_buffer == null)
-                    _buffer = new byte[_bufferSize];
+                if (_segment == null)
+                    _segment = new byte[_segmentSize];
 
                 // move the bytes from the array into the buffer
-                Array.Copy(array, offset, _buffer, _writePosition, count);
+                Array.Copy(array, offset, _segment, _writePosition, count);
 
                 // update the write position
                 _writePosition = count;
@@ -201,41 +243,41 @@ namespace CacheIt.IO
         }
 
         /// <summary>
-        /// Writes the core.
+        /// Takes an array an splits the array into segments writing each to the cache
         /// </summary>
         /// <param name="array">The array.</param>
         /// <param name="offset">The offset.</param>
         /// <param name="count">The count.</param>
         private void WriteCore(byte[] array, int offset, int count)
         {
-            int segmentIndex = GetSegmentIndex(_position, _bufferSize);
-            string segmentKey = GenerateSegmentKey(segmentIndex, _regionKey.Key);
-            var buffer = _cache.Get<byte[]>(segmentKey, () => new byte[_bufferSize], _regionKey.Region);
-            Array.Copy(array, offset, buffer, offset, count);
-            _cache.Set(segmentKey, buffer, _regionKey.Region);
+            int startSegmentIndex = _segmentService.GetSegmentIndex(_position, _segmentSize);
+            int endSegmentIndex = _segmentService.GetSegmentIndex(_position + count, _segmentSize);
+
+            int bytesWritten = 0;
+
+            // loop through segments
+            for (int segmentIndex = startSegmentIndex; segmentIndex <= endSegmentIndex; segmentIndex++)
+            {
+                // create the segment key
+                string segmentKey = _segmentService.GenerateSegmentKey(segmentIndex, _regionKey.Key);
+                
+                // fetch or create the segment in the cache
+                var segment = _cache.Get<byte[]>(segmentKey, () => new byte[_segmentSize], _regionKey.Region);
+
+                // with the segment position we know where to start writing in the current segment
+                var segmentPosition = _segmentService.GetPositionInSegment(bytesWritten + _position, segment.Length);
+
+                // calculate the byte count 
+                var byteCount = segment.Length - segmentPosition;
+                if (count - bytesWritten < byteCount)
+                    byteCount = count - bytesWritten;
+
+                Array.Copy(array, offset + bytesWritten, segment, segmentPosition, byteCount);
+                bytesWritten += byteCount;
+                _cache.Set(segmentKey, segment, _regionKey.Region);
+            }
+            
             _position += count;
-        }
-
-        /// <summary>
-        /// Gets the index of the segment.
-        /// </summary>
-        /// <param name="position">The position.</param>
-        /// <param name="bufferSize">Size of the buffer.</param>
-        /// <returns></returns>
-        private static int GetSegmentIndex(long position, int bufferSize)
-        {
-            return Convert.ToInt32(position / (long)bufferSize);
-        }
-
-        /// <summary>
-        /// Generates the segment key.
-        /// </summary>
-        /// <param name="segmentIndex">Index of the segment.</param>
-        /// <param name="key">The key.</param>
-        /// <returns></returns>
-        private static string GenerateSegmentKey(int segmentIndex, string key)
-        {
-            return string.Format("{0}_{1}", key, segmentIndex);
         }
     }
 }
