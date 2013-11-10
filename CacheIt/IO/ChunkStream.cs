@@ -303,7 +303,7 @@ namespace CacheIt.IO
                     : actualCount - bytesRead;
 
                 // copy the bytes to the input buffer
-                Array.Copy(this.localBuffer, relativePosition, buffer, bytesRead + offset, relativeCount);
+                System.Array.Copy(this.localBuffer, relativePosition, buffer, bytesRead + offset, relativeCount);
 
                 // increment both the bytes read and the current position
                 bytesRead += relativeCount;
@@ -362,7 +362,7 @@ namespace CacheIt.IO
                     : count - bytesWritten;
 
                 // copies bytes from the write buffer to the current buffer
-                Array.Copy(buffer, offset + bytesWritten, this.localBuffer, relativeOffset, relativeCount);
+                System.Array.Copy(buffer, offset + bytesWritten, this.localBuffer, relativeOffset, relativeCount);
 
                 // increment the counters
                 bytesWritten += relativeCount;

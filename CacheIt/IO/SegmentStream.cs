@@ -204,7 +204,7 @@ namespace CacheIt.IO
                     byteCount = count;
 
                 // copy the input bytes to our buffer
-                Array.Copy(array, offset, _segment, _writePosition, byteCount);
+                System.Array.Copy(array, offset, _segment, _writePosition, byteCount);
                 _writePosition += byteCount;
 
                 // we have written all of the bytes
@@ -235,7 +235,7 @@ namespace CacheIt.IO
                     _segment = new byte[_segmentSize];
 
                 // move the bytes from the array into the buffer
-                Array.Copy(array, offset, _segment, _writePosition, count);
+                System.Array.Copy(array, offset, _segment, _writePosition, count);
 
                 // update the write position
                 _writePosition = count;
@@ -272,7 +272,7 @@ namespace CacheIt.IO
                 if (count - bytesWritten < byteCount)
                     byteCount = count - bytesWritten;
 
-                Array.Copy(array, offset + bytesWritten, segment, segmentPosition, byteCount);
+                System.Array.Copy(array, offset + bytesWritten, segment, segmentPosition, byteCount);
                 bytesWritten += byteCount;
                 _cache.Set(segmentKey, segment, _regionKey.Region);
             }

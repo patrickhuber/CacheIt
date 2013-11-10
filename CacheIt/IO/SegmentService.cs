@@ -27,7 +27,7 @@ namespace CacheIt.IO
         public int GetPositionInSegment(long absolutePosition, int bufferSize)
         {
             var segmentIndex = GetSegmentIndex(absolutePosition, bufferSize);
-            return (int)(((long)bufferSize * (long)segmentIndex) - absolutePosition);
+            return (int)(absolutePosition - ((long)segmentIndex * (long)bufferSize));
         }
 
         /// <summary>
