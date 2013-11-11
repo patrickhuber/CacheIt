@@ -13,10 +13,8 @@ namespace CacheIt.UnitTests.IO
     [TestClass]
     public class SegmentServiceTests
     {
-        ISegmentService segmentService;
         public SegmentServiceTests()
         {
-            segmentService = new SegmentService();
         }
 
         #region TestContext
@@ -43,29 +41,29 @@ namespace CacheIt.UnitTests.IO
         [TestMethod]
         public void Test_GenerateSegmentKey()
         {
-            string actual = segmentService.GenerateSegmentKey(0, "mykey");
+            string actual = SegmentUtility.GenerateSegmentKey(0, "mykey");
             Assert.AreEqual("mykey_0", actual);
         }
 
         [TestMethod]
         public void Test_GetPositionInSegment()
         {
-            int actual = segmentService.GetPositionInSegment(1024, 1024);
+            int actual = SegmentUtility.GetPositionInSegment(1024, 1024);
             Assert.AreEqual(0, actual);
-            actual = segmentService.GetPositionInSegment(1025, 1024);
+            actual = SegmentUtility.GetPositionInSegment(1025, 1024);
             Assert.AreEqual(1, actual);
-            actual = segmentService.GetPositionInSegment(1023, 1024);
+            actual = SegmentUtility.GetPositionInSegment(1023, 1024);
             Assert.AreEqual(1023, actual);
-            actual = segmentService.GetPositionInSegment(2048, 1024);
+            actual = SegmentUtility.GetPositionInSegment(2048, 1024);
             Assert.AreEqual(0, actual);
         }
 
         [TestMethod]
         public void Test_GetSegmentIndex()
         {
-            int actual = segmentService.GetSegmentIndex(0, 1024);
+            int actual = SegmentUtility.GetSegmentIndex(0, 1024);
             Assert.AreEqual(0, actual);
-            actual = segmentService.GetSegmentIndex(1025, 1024);
+            actual = SegmentUtility.GetSegmentIndex(1025, 1024);
             Assert.AreEqual(1, actual);
         }
     }

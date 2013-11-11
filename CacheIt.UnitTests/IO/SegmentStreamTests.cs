@@ -14,7 +14,7 @@ namespace CacheIt.UnitTests.IO
     [TestClass]
     public class SegmentStreamTests
     {
-        private SegmentService segmentService;
+        private SegmentUtility segmentService;
         private ObjectCache cache;
         private SegmentStream stream;
         private const string Key = "mykey";
@@ -22,7 +22,7 @@ namespace CacheIt.UnitTests.IO
 
         public SegmentStreamTests()
         {
-            segmentService = new SegmentService();
+            segmentService = new SegmentUtility();
             cache = new MemoryCache("BufferedCacheStreamTests");
             stream = new SegmentStream(cache, Key, segmentService, BufferSize);
         }
@@ -49,7 +49,17 @@ namespace CacheIt.UnitTests.IO
 
         #endregion  TestContext
 
-        #region Write 
+        #region Read
+        
+        [TestMethod]
+        public void Test_Read()
+        { 
+            
+        }
+
+        #endregion Read
+
+        #region Write
         [TestMethod]
         public void Test_Write_Large_Array()
         {            

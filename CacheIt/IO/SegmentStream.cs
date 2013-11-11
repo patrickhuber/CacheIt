@@ -15,7 +15,6 @@ namespace CacheIt.IO
     {
         private ObjectCache _cache;
         private RegionKey _regionKey;
-        private ISegmentService _segmentService;
 
         private bool _canRead;
         private bool _canSeek;
@@ -52,20 +51,9 @@ namespace CacheIt.IO
         /// </summary>
         /// <param name="objectCache">The object cache.</param>
         /// <param name="key">The key.</param>
-        /// <param name="segmentSize">Size of the segment.</param>
-        /// <param name="region">The region.</param>
-        public SegmentStream(ObjectCache objectCache, string key, int segmentSize = DefaultSegmentSize, string region = DefaultRegion)
-            : this(objectCache, key, new SegmentService(), segmentSize, region)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SegmentStream"/> class.
-        /// </summary>
-        /// <param name="objectCache">The object cache.</param>
-        /// <param name="key">The key.</param>
         /// <param name="region">The region.</param>
         /// <param name="segmentSize">Size of the buffer.</param>
-        public SegmentStream(ObjectCache objectCache, string key, ISegmentService segmentService, int segmentSize = DefaultSegmentSize, string region = DefaultRegion)
+        public SegmentStream(ObjectCache objectCache, string key, int segmentSize = DefaultSegmentSize, string region = DefaultRegion)
         {
             _segment = new byte[segmentSize];
             _segmentSize = segmentSize;
@@ -74,7 +62,6 @@ namespace CacheIt.IO
             _canRead = true;
             _canWrite = true;
             _canSeek = true;
-            _segmentService = segmentService;
         }
         
         public override bool CanRead
@@ -297,8 +284,8 @@ namespace CacheIt.IO
         /// <param name="count">The count.</param>
         private void WriteCore(byte[] array, int offset, int count)
         {
-            int startSegmentIndex = _segmentService.GetSegmentIndex(_position, _segmentSize);
-            int endSegmentIndex = _segmentService.GetSegmentIndex(_position + count, _segmentSize);
+            int startSegmentIndex = SegmentUtility.GetSegmentIndex(_position, _segmentSize);
+            int endSegmentIndex = SegmentUtility.GetSegmentIndex(_position + count, _segmentSize);
 
             int bytesWritten = 0;
 
@@ -306,10 +293,10 @@ namespace CacheIt.IO
             for (int segmentIndex = startSegmentIndex; segmentIndex <= endSegmentIndex; segmentIndex++)
             {
                 // create the segment key
-                string segmentKey = _segmentService.GenerateSegmentKey(segmentIndex, _regionKey.Key);
+                string segmentKey = SegmentUtility.GenerateSegmentKey(segmentIndex, _regionKey.Key);
 
                 // with the segment position we know where to start writing in the current segment
-                var segmentPosition = _segmentService.GetPositionInSegment(bytesWritten + _position, _segmentSize);
+                var segmentPosition = SegmentUtility.GetPositionInSegment(bytesWritten + _position, _segmentSize);
 
                 // calculate the byte count 
                 var byteCount = _segmentSize - segmentPosition;
