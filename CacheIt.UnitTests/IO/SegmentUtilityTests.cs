@@ -11,9 +11,9 @@ namespace CacheIt.UnitTests.IO
     /// Summary description for SegmentServiceTests
     /// </summary>
     [TestClass]
-    public class SegmentServiceTests
+    public class SegmentUtilityTests
     {
-        public SegmentServiceTests()
+        public SegmentUtilityTests()
         {
         }
 
