@@ -14,17 +14,15 @@ namespace CacheIt.UnitTests.IO
     [TestClass]
     public class SegmentStreamTests
     {
-        private SegmentUtility segmentService;
         private ObjectCache cache;
         private SegmentStream stream;
         private const string Key = "mykey";
         private const int BufferSize = 1024;
 
         public SegmentStreamTests()
-        {
-            segmentService = new SegmentUtility();
+        {            
             cache = new MemoryCache("BufferedCacheStreamTests");
-            stream = new SegmentStream(cache, Key, segmentService, BufferSize);
+            stream = new SegmentStream(cache, Key, BufferSize);
         }
 
         #region  TestContext
@@ -92,7 +90,7 @@ namespace CacheIt.UnitTests.IO
                 stream.WriteByte((byte)' ');
             }
 
-            byte[] bytes = cache.Get(segmentService.GenerateSegmentKey(0, Key)) as byte[];
+            byte[] bytes = cache.Get(SegmentUtility.GenerateSegmentKey(0, Key)) as byte[];
             Assert.IsNull(bytes);
         }
 
@@ -109,9 +107,9 @@ namespace CacheIt.UnitTests.IO
                 stream.WriteByte((byte)' ');
                 bytesWritten += buffer.Length + 1;
             }
-            byte[] bytes = cache.Get(segmentService.GenerateSegmentKey(0, Key)) as byte[];
+            byte[] bytes = cache.Get(SegmentUtility.GenerateSegmentKey(0, Key)) as byte[];
             Assert.IsNotNull(bytes);
-            bytes = cache.Get(segmentService.GenerateSegmentKey(1, Key)) as byte[];
+            bytes = cache.Get(SegmentUtility.GenerateSegmentKey(1, Key)) as byte[];
             Assert.IsNull(bytes);
         }
 
@@ -139,8 +137,8 @@ namespace CacheIt.UnitTests.IO
         {
             for (int index = offset; index < expected.Length; index += BufferSize)
             {
-                int segmentIndex = segmentService.GetSegmentIndex(index, BufferSize);
-                var buffer = cache.Get(segmentService.GenerateSegmentKey(segmentIndex, Key)) as byte[];
+                int segmentIndex = SegmentUtility.GetSegmentIndex(index, BufferSize);
+                var buffer = cache.Get(SegmentUtility.GenerateSegmentKey(segmentIndex, Key)) as byte[];
                 Assert.IsNotNull(buffer);
                 for (int b = 0; b < buffer.Length && index * BufferSize + b < expected.Length; b++)
                 {
