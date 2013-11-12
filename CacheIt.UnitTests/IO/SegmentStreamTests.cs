@@ -53,7 +53,7 @@ namespace CacheIt.UnitTests.IO
         [TestMethod]
         public void Test_Read_Small_Segment()
         {
-            var actual = new string('a', 1024);
+            var actual = (LoremIpsum.OneThousandCharacters + LoremIpsum.OneHundredFourtyCharacters).Substring(0, 1024);
             var buffer = Encoding.ASCII.GetBytes(actual);
             cache.Set(SegmentUtility.GenerateSegmentKey(0, Key), buffer);
             cache.Set(Key, new SegmentStreamHeader(1024) { Length = buffer.Length });
