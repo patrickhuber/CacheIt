@@ -140,9 +140,107 @@ namespace CacheIt.IO
             }
         }
 
+        /// <summary>
+        /// Reads the specified array.
+        /// </summary>
+        /// <param name="array">The array.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// <exception cref="System.NotImplementedException"></exception>
         public override int Read(byte[] array, int offset, int count)
         {
-            throw new NotImplementedException();
+            Assert.IsNotNull(array, "Array parameter is null");
+            Assert.IsFalse(offset < 0, "Offset parameter is less than zero.");
+            Assert.IsFalse(count < 0, "Count parameter is less than zero.");
+            Assert.IsFalse(array.Length - offset < count, "Invalid offset and length, read would exceed bounds of array.");
+
+            bool moreBytesToRead = false;
+            int byteCount = _readLength - _readPosition;
+
+            if (byteCount == 0)
+            {
+                if (!CanRead)
+                    throw new NotSupportedException("Unable to read while the stream is disposing.");
+                if (_writePosition > 0)
+                    FlushWrite(false);
+                if (!CanSeek || count >= _segmentSize)
+                {
+                    int bytesRead = ReadCore(array, 0, count);
+                    this._readPosition = 0;
+                    this._readLength = 0;
+                    return bytesRead;
+                }
+                else 
+                {
+                    if (_segment == null)
+                        _segment = new byte[_segmentSize];
+                    byteCount = ReadCore(_segment, 0, _segmentSize);
+                    if (byteCount == 0)
+                        return 0;
+                    moreBytesToRead = byteCount < _segmentSize;
+                    _readPosition = 0;
+                    _readLength = byteCount;
+                }
+            }
+
+            if (byteCount > count)
+            {
+                byteCount = count;
+            }
+
+            Array.Copy(_segment, _readPosition, array, offset, byteCount);
+
+            _readPosition += byteCount;
+            if (byteCount < count && !moreBytesToRead)
+            {
+                int bytesRead = ReadCore(array, offset + byteCount, count - byteCount);
+                byteCount += bytesRead;
+                _readPosition = 0;
+                _readLength = 0;
+            }
+            return byteCount;
+        }
+
+        /// <summary>
+        /// Reads the core.
+        /// </summary>
+        /// <param name="array">The array.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        private int ReadCore(byte[] array, int offset, int count)
+        {
+            int startSegmentIndex = SegmentUtility.GetSegmentIndex(_position, _segmentSize);
+            int endSegmentIndex = SegmentUtility.GetSegmentIndex(_position + count, _segmentSize);
+
+            int bytesRead = 0;
+
+            // loop through segments
+            for (int segmentIndex = startSegmentIndex; segmentIndex <= endSegmentIndex; segmentIndex++)
+            {
+                string segmentKey = SegmentUtility.GenerateSegmentKey(segmentIndex, _regionKey.Key);
+                var segmentPosition = SegmentUtility.GetPositionInSegment(bytesRead + _position, _segmentSize);
+
+                // calculate the byteCount
+                var byteCount = _segmentSize - segmentPosition;
+                if (count - bytesRead < byteCount)
+                    byteCount = count - bytesRead;
+
+                // are there bytes to read?
+                if (byteCount > 0)
+                {
+                    // fetch the cache segment from cache
+                    var segment = _cache.Get(segmentKey, _regionKey.Region) as byte[];
+                    if (segment == null)
+                        throw new InvalidOperationException(string.Format("Unable to read segment {0} from the Cache.", segmentKey));
+
+                    // copy the segment from cache onto the array
+                    System.Array.Copy(segment, segmentPosition, array, offset+bytesRead, byteCount);
+                    bytesRead += byteCount;
+                }
+            }
+            return bytesRead;
         }
 
         public override long Seek(long offset, SeekOrigin origin)

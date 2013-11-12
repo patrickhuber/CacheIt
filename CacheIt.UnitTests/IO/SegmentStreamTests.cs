@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Runtime.Caching;
 using CacheIt.IO;
+using CacheIt;
 
 namespace CacheIt.UnitTests.IO
 {
@@ -50,9 +51,30 @@ namespace CacheIt.UnitTests.IO
         #region Read
         
         [TestMethod]
-        public void Test_Read()
-        { 
-            
+        public void Test_Read_Small_Segment()
+        {
+            var actual = new string('a', 1024);
+            var buffer = Encoding.ASCII.GetBytes(actual);
+            cache.Set(SegmentUtility.GenerateSegmentKey(0, Key), buffer);
+            cache.Set(Key, new SegmentStreamHeader(1024) { Length = buffer.Length });
+
+            byte[] readBuffer = new byte[100];
+            stream.Read(readBuffer, 0, readBuffer.Length);
+
+            Assert.AreEqual(actual.Substring(0, 100), Encoding.ASCII.GetString(readBuffer));
+        }
+
+        [TestMethod]
+        public void Test_Read_Large_Array()
+        {
+            var actual = LoremIpsum.ThreeThousandSixtyNineCharacter;
+            var buffer = Encoding.ASCII.GetBytes(actual.Substring(0, 1024));
+            buffer = Encoding.ASCII.GetBytes(actual.Substring(1024, 1024));
+
+            byte[] readBuffer = new byte[2048];
+            stream.Read(readBuffer, 0, readBuffer.Length);
+
+            Assert.AreEqual(actual.Substring(0, 2048), Encoding.ASCII.GetString(readBuffer));
         }
 
         #endregion Read
@@ -64,7 +86,7 @@ namespace CacheIt.UnitTests.IO
             var bytes = Encoding.ASCII.GetBytes(LoremIpsum.ThreeThousandSixtyNineCharacter);
             stream.Write(bytes, 0, bytes.Length);
 
-            AssertAreEqual(bytes, 0);
+            AssertCacheContentsAreEqualTo(bytes, 0);
         }
 
         [TestMethod]
@@ -75,8 +97,8 @@ namespace CacheIt.UnitTests.IO
             var secondSegment = Encoding.ASCII.GetBytes(twoThousandCharacters);
             stream.Write(firstSegment, 0, firstSegment.Length);
             stream.Write(secondSegment, 0, secondSegment.Length);
-            AssertAreEqual(firstSegment, 0);
-            AssertAreEqual(secondSegment, firstSegment.Length);
+            AssertCacheContentsAreEqualTo(firstSegment, 0);
+            AssertCacheContentsAreEqualTo(secondSegment, firstSegment.Length);
         }
 
         [TestMethod]
@@ -133,7 +155,7 @@ namespace CacheIt.UnitTests.IO
         }
         #endregion Length
 
-        private void AssertAreEqual(byte[] expected, int offset)
+        private void AssertCacheContentsAreEqualTo(byte[] expected, int offset)
         {
             for (int index = offset; index < expected.Length; index += BufferSize)
             {
