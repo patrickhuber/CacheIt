@@ -67,14 +67,25 @@ namespace CacheIt.UnitTests.IO
         [TestMethod]
         public void Test_Read_Large_Array()
         {
-            var actual = LoremIpsum.ThreeThousandSixtyNineCharacter;
-            var buffer = Encoding.ASCII.GetBytes(actual.Substring(0, 1024));
-            buffer = Encoding.ASCII.GetBytes(actual.Substring(1024, 1024));
+            const int TotalSize = 2048;
 
-            byte[] readBuffer = new byte[2048];
+            var actual = LoremIpsum.ThreeThousandSixtyNineCharacter.Substring(0, TotalSize);
+            
+            // segment 1 |1024|
+            var buffer = Encoding.ASCII.GetBytes(actual.Substring(0, BufferSize));            
+            cache.Set(SegmentUtility.GenerateSegmentKey(0, Key), buffer);
+            
+            // segment 2 |1024|
+            buffer = Encoding.ASCII.GetBytes(actual.Substring(BufferSize, BufferSize));
+            cache.Set(SegmentUtility.GenerateSegmentKey(1, Key), buffer);
+            
+            // header info
+            cache.Set(Key, new SegmentStreamHeader(BufferSize) { Length = buffer.Length });
+
+            byte[] readBuffer = new byte[TotalSize];
             stream.Read(readBuffer, 0, readBuffer.Length);
 
-            Assert.AreEqual(actual.Substring(0, 2048), Encoding.ASCII.GetString(readBuffer));
+            Assert.AreEqual(actual, Encoding.ASCII.GetString(readBuffer));
         }
 
         #endregion Read
