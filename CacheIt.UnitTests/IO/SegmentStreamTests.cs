@@ -88,7 +88,33 @@ namespace CacheIt.UnitTests.IO
             Assert.AreEqual(actual, Encoding.ASCII.GetString(readBuffer));
         }
 
+        [TestMethod]
+        public void Test_Read_Byte()
+        {
+            var actual = (LoremIpsum.OneThousandCharacters + LoremIpsum.OneHundredFourtyCharacters).Substring(0, 1024);
+            var buffer = Encoding.ASCII.GetBytes(actual);
+            cache.Set(SegmentUtility.GenerateSegmentKey(0, Key), buffer);
+            cache.Set(Key, new SegmentStreamHeader(1024) { Length = buffer.Length });
+
+            var readByte = stream.ReadByte();
+            Assert.AreEqual(readByte, actual[0]);
+        }
+
         #endregion Read
+
+        #region Seek
+
+        [TestMethod]
+        public void Test_Seek()
+        {
+            var actual = (LoremIpsum.OneThousandCharacters + LoremIpsum.OneHundredFourtyCharacters).Substring(0, 1024);
+            var buffer = Encoding.ASCII.GetBytes(actual);
+            cache.Set(SegmentUtility.GenerateSegmentKey(0, Key), buffer);
+            cache.Set(Key, new SegmentStreamHeader(1024) { Length = buffer.Length });
+
+        }
+        
+        #endregion Seek
 
         #region Write
         [TestMethod]

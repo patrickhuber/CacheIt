@@ -243,9 +243,102 @@ namespace CacheIt.IO
             return bytesRead;
         }
 
+        /// <summary>
+        /// Reads a byte from the stream and advances the position within the stream by one byte, or returns -1 if at the end of the stream.
+        /// </summary>
+        /// <returns>
+        /// The unsigned byte cast to an Int32, or -1 if at the end of the stream.
+        /// </returns>
+        public override int ReadByte()
+        {
+            if (_readLength == 0 && !this.CanRead)
+                throw new NotSupportedException("Read not supported while disposing.");
+            if (_readPosition == _readLength)
+            {
+                if (_writePosition > 0)
+                    FlushWrite(false);
+                if (_segment == null)
+                    _segment = new byte[_segmentSize];
+                _readLength = ReadCore(_segment, 0, _segmentSize);
+                _readPosition = 0;
+            }
+            if (_readPosition == _readLength)
+                return -1;
+            int byteRead = (int)_segment[_readPosition];
+            ++_readPosition;
+            return byteRead;
+        }
+
+        /// <summary>
+        /// When overridden in a derived class, sets the position within the current stream.
+        /// </summary>
+        /// <param name="offset">A byte offset relative to the <paramref name="origin" /> parameter.</param>
+        /// <param name="origin">A value of type <see cref="T:System.IO.SeekOrigin" /> indicating the reference point used to obtain the new position.</param>
+        /// <returns>
+        /// The new position within the current stream.
+        /// </returns>
+        /// <exception cref="System.NotImplementedException"></exception>
         public override long Seek(long offset, SeekOrigin origin)
         {
-            throw new NotImplementedException();
+            if (origin < SeekOrigin.Begin || origin > SeekOrigin.End)
+                throw new ArgumentException("Invalid SeekOrigin");
+            if (!CanSeek)
+                throw new NotSupportedException("Seek is disabled while disposing");
+            if (_writePosition > 0)
+                FlushWrite(false);
+            else if (origin == SeekOrigin.Current)
+                offset -= (long)(_readLength - _readPosition);
+            long relativeOffset = _position + (_readPosition - _readLength);
+            long position = SeekCore(offset, origin);
+
+            if (_readLength > 0)
+            {
+                if (relativeOffset == position)
+                {
+                    if (_readPosition > 0)
+                    {
+                        Array.Copy(_segment, _readPosition, _segment, 0, _readLength - _readPosition);
+                        _readLength -= _readPosition;
+                        _readPosition = 0;
+                    }
+                    if (_readLength > 0)
+                        SeekCore(_readLength, SeekOrigin.Current);
+                }
+                else if (relativeOffset - _readPosition < position && position < relativeOffset + _readLength - _readPosition)
+                {
+                    int seekBytes = (int)(position - relativeOffset);
+                    Array.Copy(_segment, _readPosition + seekBytes, _segment, 0, _readLength - (_readPosition + seekBytes));
+                    _readLength -= _readPosition + seekBytes;
+                    _readPosition = 0;
+                    if (_readLength > 0)
+                        SeekCore(_readLength, SeekOrigin.Current);
+                }
+                else 
+                {
+                    _readLength = 0;
+                    _readPosition = 0;
+                }
+            }
+            return position;
+        }
+
+        /// <summary>
+        /// Seeks the core.
+        /// </summary>
+        /// <param name="offset">The offset.</param>
+        /// <param name="origin">The origin.</param>
+        /// <returns></returns>
+        /// <exception cref="System.Exception"></exception>
+        private long SeekCore(long offset, SeekOrigin origin)
+        {
+            var length = GetHeader().Length;
+            var position = offset;
+            if(origin == SeekOrigin.End)
+                position = length - offset;
+            if(origin == SeekOrigin.Current)
+                position = _position + offset;
+            _position = position;
+            return position;
         }
 
         /// <summary>
