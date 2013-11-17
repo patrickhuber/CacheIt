@@ -63,31 +63,58 @@ namespace CacheIt.IO
             _canWrite = true;
             _canSeek = true;
         }
-        
+
+        /// <summary>
+        /// Gets a value indicating whether the current stream supports reading.
+        /// </summary>
+        /// <returns>true if the stream supports reading; otherwise, false.</returns>
         public override bool CanRead
         {
             get { return _canRead; }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the current stream supports seeking.
+        /// </summary>
+        /// <returns>true if the stream supports seeking; otherwise, false.</returns>
         public override bool CanSeek
         {
             get { return _canSeek; }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the current stream supports writing.
+        /// </summary>
+        /// <returns>true if the stream supports writing; otherwise, false.</returns>
         public override bool CanWrite
         {
             get { return _canWrite; }
         }
 
+        /// <summary>
+        /// Flushes the write.
+        /// </summary>
+        /// <param name="calledFromFinalizer">if set to <c>true</c> [called from finalizer].</param>
         private void FlushWrite(bool calledFromFinalizer)
         {
             this.WriteCore(this._segment, 0, this._writePosition);
             this._writePosition = 0;
         }
-        
-        private void FlushRead()
-        { }
 
+        /// <summary>
+        /// Flushes the read.
+        /// </summary>
+        private void FlushRead()
+        { 
+            if(_readPosition - _readLength != 0)
+                SeekCore((long)(_readPosition - _readLength), SeekOrigin.Current);
+            _readPosition = 0;
+            _readLength = 0;
+        }
+
+        /// <summary>
+        /// Flushes the internal buffer.
+        /// </summary>
         private void FlushInternalBuffer()
         {
             if (this._writePosition > 0)
@@ -98,9 +125,12 @@ namespace CacheIt.IO
             this.FlushRead();
         }
 
+        /// <summary>
+        /// Clears all buffers for this stream and causes any buffered data to be written to the underlying device.
+        /// </summary>
         public override void Flush()
         {
-            throw new NotImplementedException();
+            FlushInternalBuffer();    
         }
 
         /// <summary>
@@ -111,7 +141,7 @@ namespace CacheIt.IO
         {
             get 
             {
-                SegmentStreamHeader header = GetHeader();
+                SegmentStreamHeader header = Header;
                 long fileSize = header.Length;
                 if (_writePosition > 0 && _position + _writePosition > fileSize)
                     fileSize = _writePosition + _position;
@@ -123,20 +153,41 @@ namespace CacheIt.IO
         /// Gets the header.
         /// </summary>
         /// <returns></returns>
-        private SegmentStreamHeader GetHeader()
+        private SegmentStreamHeader Header
         {
-            return _cache.Get<SegmentStreamHeader>(Key, () => new SegmentStreamHeader(_segmentSize), _regionKey.Region);
+            get
+            {
+                return _cache.Get<SegmentStreamHeader>(Key, () => new SegmentStreamHeader(_segmentSize), _regionKey.Region);
+            }
+            set
+            {
+                _cache.Set(Key, value, Region);
+            }            
         }
 
+        /// <summary>
+        /// Gets or sets the position within the current stream.
+        /// </summary>
+        /// <returns>The current position within the stream.</returns>
+        /// <exception cref="System.InvalidOperationException">Seek is disabled while disposing.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">value;Position set value must be non negative</exception>
         public override long Position
         {
             get
             {
-                throw new NotImplementedException();
+                if (!CanSeek)
+                    throw new InvalidOperationException("Seek is disabled while disposing.");
+                return _position + (long)(_readPosition - _readLength + _writePosition);
             }
             set
             {
-                throw new NotImplementedException();
+                if (value < 0L)
+                    throw new ArgumentOutOfRangeException("value", "Position set value must be non negative");
+                if (_writePosition > 0)
+                    FlushWrite(false);
+                _readPosition = 0;
+                _readLength = 0;
+                Seek(value, SeekOrigin.Begin);
             }
         }
 
@@ -331,13 +382,21 @@ namespace CacheIt.IO
         /// <exception cref="System.Exception"></exception>
         private long SeekCore(long offset, SeekOrigin origin)
         {
-            var length = GetHeader().Length;
+            var length = Header.Length;
             var position = offset;
             if(origin == SeekOrigin.End)
                 position = length - offset;
             if(origin == SeekOrigin.Current)
                 position = _position + offset;
             _position = position;
+            var header = this.Header;
+
+            // adjust the header length
+            if (header.Length < position)
+            {
+                header.Length = position;
+                this.Header = header;
+            }
             return position;
         }
 
@@ -362,9 +421,65 @@ namespace CacheIt.IO
 
             this.SetLengthCore(value);
         }
-        
+
+        /// <summary>
+        /// Sets the length core.
+        /// </summary>
+        /// <param name="value">The value.</param>
         private void SetLengthCore(long value)
         {
+            long offset = _position;
+            long length = Header.Length;
+
+            // Set the physicial size for the specified segmenet collection to the current position
+            // Can be used to truncate or extend the physicial size
+            if (value > length)
+                Extend(value, length);
+            if (value < length)
+                Truncate(value, length);
+
+            if (offset == value)
+                return;
+            if (offset < value)
+                SeekCore(offset, SeekOrigin.Begin);
+            else
+                SeekCore(0L, SeekOrigin.End);            
+        }
+
+        /// <summary>
+        /// Extends the stream to the specified length.
+        /// </summary>
+        /// <param name="length">The length.</param>
+        protected virtual void Extend(long newLength, long currentLength)
+        {
+            if (newLength <= currentLength)
+                return;
+            var currentLengthSegmentIndex = SegmentUtility.GetSegmentIndex(currentLength -1, _segmentSize);
+            var newLengthSegmentIndex = SegmentUtility.GetSegmentIndex(newLength -1, _segmentSize);
+
+            // allocate segments between the current length and the target length
+            for (int i = currentLengthSegmentIndex; i <= newLengthSegmentIndex; i++)
+            { 
+                string key = SegmentUtility.GenerateSegmentKey(i, _regionKey.Key);
+                _cache.Get(key, () => new byte[_segmentSize], Region);
+            }
+        }
+
+        /// <summary>
+        /// Truncates the stream to the specified length.
+        /// </summary>
+        /// <param name="length">The length.</param>
+        protected virtual void Truncate(long newLength, long currentLength)
+        {
+            if (newLength >= currentLength)
+                return;
+            var currentLengthSegmentIndex = SegmentUtility.GetSegmentIndex(currentLength -1, _segmentSize);
+            var newLengthSegmentIndex = SegmentUtility.GetSegmentIndex(newLength-1, _segmentSize);
+            for (int i = currentLengthSegmentIndex; i > newLengthSegmentIndex; i--)
+            {
+                string key = SegmentUtility.GenerateSegmentKey(i, Key);
+                _cache.Remove(key, Region);
+            }
         }
 
         /// <summary>
@@ -507,12 +622,37 @@ namespace CacheIt.IO
             }
             
             _position += count;
-            var header = GetHeader();
+            var header = this.Header;
             if (_position > header.Length)
             {
                 header.Length = _position;
-                _cache.Set(Key, header, Region);
+                this.Header = header;
             }
         }
+
+        #region IDisposable
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="T:System.IO.Stream" /> and optionally releases the managed resources.
+        /// </summary>
+        /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+        protected override void Dispose(bool disposing)
+        {
+            try
+            {
+                if (_writePosition <= 0)
+                    return;
+                FlushWrite(!disposing);
+            }
+            finally 
+            {
+                _canRead = false;
+                _canWrite = false;
+                _canSeek = false;
+                base.Dispose(disposing);
+            }            
+        }
+        
+        #endregion IDisposable
     }
 }

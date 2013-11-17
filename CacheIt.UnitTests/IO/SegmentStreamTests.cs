@@ -53,10 +53,8 @@ namespace CacheIt.UnitTests.IO
         [TestMethod]
         public void Test_Read_Small_Segment()
         {
-            var actual = (LoremIpsum.OneThousandCharacters + LoremIpsum.OneHundredFourtyCharacters).Substring(0, 1024);
-            var buffer = Encoding.ASCII.GetBytes(actual);
-            cache.Set(SegmentUtility.GenerateSegmentKey(0, Key), buffer);
-            cache.Set(Key, new SegmentStreamHeader(1024) { Length = buffer.Length });
+            const int TotalSize = 1024;
+            var actual = FillCache(TotalSize);
 
             byte[] readBuffer = new byte[100];
             stream.Read(readBuffer, 0, readBuffer.Length);
@@ -68,19 +66,7 @@ namespace CacheIt.UnitTests.IO
         public void Test_Read_Large_Array()
         {
             const int TotalSize = 2048;
-
-            var actual = LoremIpsum.ThreeThousandSixtyNineCharacter.Substring(0, TotalSize);
-            
-            // segment 1 |1024|
-            var buffer = Encoding.ASCII.GetBytes(actual.Substring(0, BufferSize));            
-            cache.Set(SegmentUtility.GenerateSegmentKey(0, Key), buffer);
-            
-            // segment 2 |1024|
-            buffer = Encoding.ASCII.GetBytes(actual.Substring(BufferSize, BufferSize));
-            cache.Set(SegmentUtility.GenerateSegmentKey(1, Key), buffer);
-            
-            // header info
-            cache.Set(Key, new SegmentStreamHeader(BufferSize) { Length = buffer.Length });
+            var actual = FillCache(TotalSize);
 
             byte[] readBuffer = new byte[TotalSize];
             stream.Read(readBuffer, 0, readBuffer.Length);
@@ -91,11 +77,7 @@ namespace CacheIt.UnitTests.IO
         [TestMethod]
         public void Test_Read_Byte()
         {
-            var actual = (LoremIpsum.OneThousandCharacters + LoremIpsum.OneHundredFourtyCharacters).Substring(0, 1024);
-            var buffer = Encoding.ASCII.GetBytes(actual);
-            cache.Set(SegmentUtility.GenerateSegmentKey(0, Key), buffer);
-            cache.Set(Key, new SegmentStreamHeader(1024) { Length = buffer.Length });
-
+            var actual = FillCache(1024);
             var readByte = stream.ReadByte();
             Assert.AreEqual(readByte, actual[0]);
         }
@@ -107,11 +89,8 @@ namespace CacheIt.UnitTests.IO
         [TestMethod]
         public void Test_Seek()
         {
-            var actual = (LoremIpsum.OneThousandCharacters + LoremIpsum.OneHundredFourtyCharacters).Substring(0, 1024);
-            var buffer = Encoding.ASCII.GetBytes(actual);
-            cache.Set(SegmentUtility.GenerateSegmentKey(0, Key), buffer);
-            cache.Set(Key, new SegmentStreamHeader(1024) { Length = buffer.Length });
-
+            const int TotalSize = 1024;
+            var actual = FillCache(TotalSize);
         }
         
         #endregion Seek
@@ -192,6 +171,49 @@ namespace CacheIt.UnitTests.IO
         }
         #endregion Length
 
+        #region SetLength
+        
+        [TestMethod]
+        public void SetLength_0_Removes_All_Segments()
+        {
+            var actual = FillCache(1024);
+            stream.SetLength(0);
+            Assert.IsFalse(cache.Contains(SegmentUtility.GenerateSegmentKey(0, Key)));
+        }
+
+        [TestMethod]
+        public void SetLength_BufferSize_Removes_Correct_Segment()
+        {
+            const int TotalSize = 3072;
+            var actual = FillCache(TotalSize);
+            stream.SetLength(1024);
+            Assert.IsTrue(cache.Contains(SegmentUtility.GenerateSegmentKey(0, Key)));
+            Assert.IsFalse(cache.Contains(SegmentUtility.GenerateSegmentKey(1, Key)));
+        }
+
+        [TestMethod]
+        public void SetLength_Extend_Adds_Additional_Segments()
+        {
+            const int TotalSize = 1024;
+            var actual = FillCache(TotalSize);
+            stream.SetLength(3072);
+            for (int i = 0; i < 3;i++)
+                Assert.IsTrue(cache.Contains(SegmentUtility.GenerateSegmentKey(i, Key)));
+            Assert.IsFalse(cache.Contains(SegmentUtility.GenerateSegmentKey(3, Key)));
+        }
+
+        [TestMethod]
+        public void SetLength_Truncate_Removes_Extra_Segments()
+        {
+            const int TotalSize = 3072;
+            var actual = FillCache(TotalSize);
+            stream.SetLength(500);
+            Assert.IsTrue(cache.Contains(SegmentUtility.GenerateSegmentKey(0, Key)));
+            Assert.IsFalse(cache.Contains(SegmentUtility.GenerateSegmentKey(1, Key)));
+        }
+
+        #endregion SetLength
+
         private void AssertCacheContentsAreEqualTo(byte[] expected, int offset)
         {
             for (int index = offset; index < expected.Length; index += BufferSize)
@@ -204,6 +226,39 @@ namespace CacheIt.UnitTests.IO
                     Assert.AreEqual(buffer[b], expected[index * BufferSize + b]);
                 }
             }
+        }
+
+        private string FillCache(int size)
+        {
+            // allocate the appropriate text blob
+            var actual = string.Empty;
+            var textLength = LoremIpsum.ThreeThousandSixtyNineCharacter.Length;
+
+            int repeat = size / textLength;
+            int remainder = size % textLength;
+
+            for (int i = 0; i < repeat; i++)
+                actual += LoremIpsum.ThreeThousandSixtyNineCharacter;
+            if (remainder > 0)
+                actual += LoremIpsum.ThreeThousandSixtyNineCharacter.Substring(0, remainder);
+
+            // break the blob into buffers
+            int startIndex = SegmentUtility.GetSegmentIndex(0, BufferSize);
+            int endIndex = SegmentUtility.GetSegmentIndex(size <= 0 ? 0 : size - 1, BufferSize);
+                        
+            for (int i = startIndex; i <= endIndex; i++)
+            {
+                byte[] buffer = new byte[BufferSize];
+                int offset = i * BufferSize;
+                int count = BufferSize;
+                if (offset + count > size)
+                    count = size - offset;
+                byte[] bytes = Encoding.ASCII.GetBytes(actual.Substring(offset, count));
+                Array.Copy(bytes, buffer, count);
+                cache.Set(SegmentUtility.GenerateSegmentKey(i, Key), buffer);
+            }
+            cache.Set(Key, new SegmentStreamHeader(BufferSize) { Length = size });
+            return actual;
         }
     }
 }
