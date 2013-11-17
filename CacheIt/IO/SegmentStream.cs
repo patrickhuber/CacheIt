@@ -480,6 +480,11 @@ namespace CacheIt.IO
                 string key = SegmentUtility.GenerateSegmentKey(i, Key);
                 _cache.Remove(key, Region);
             }
+            if (newLength == 0)
+            {
+                string key = SegmentUtility.GenerateSegmentKey(0, Key);
+                _cache.Remove(key, Region);
+            }
         }
 
         /// <summary>
