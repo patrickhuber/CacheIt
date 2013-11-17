@@ -97,6 +97,16 @@ namespace CacheIt.UnitTests.IO
 
         #region Write
         [TestMethod]
+        public void Test_Write_Byte()
+        {
+            byte byteToWrite = Convert.ToByte('a');
+            stream.WriteByte(byteToWrite);
+            stream.Flush();
+            var bytes = cache.Get(SegmentUtility.GenerateSegmentKey(0, Key)) as byte[];
+            Assert.AreEqual(byteToWrite, bytes[0]);
+        }
+
+        [TestMethod]
         public void Test_Write_Large_Array()
         {            
             var bytes = Encoding.ASCII.GetBytes(LoremIpsum.ThreeThousandSixtyNineCharacter);
