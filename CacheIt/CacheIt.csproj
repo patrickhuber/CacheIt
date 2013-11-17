@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="CacheBase.cs" />
     <Compile Include="CacheEntryChangeMonitorBase.cs" />
-    <Compile Include="Collections\PersistentSetAdapter.cs" />
+    <Compile Include="Collections\PersistentSet.cs" />
     <Compile Include="Configuration\IGlobalConfiguration.cs" />
     <Compile Include="Diagnostics\Assert.cs" />
     <Compile Include="Interception\DependencyResolver.cs" />

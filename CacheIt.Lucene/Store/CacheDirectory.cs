@@ -49,7 +49,7 @@ namespace CacheIt.Lucene.Store
             // implementation specific list to CacheBase but I would prefer to avoid this
             // apprach at all costs.
             var hashSet = objectCache.Get(directory, () => new HashSet<string>(), region);
-            files = new PersistentSetAdapter<string>(hashSet, objectCache, directory, region);
+            files = new PersistentSet<string>(hashSet, objectCache, directory, region);
 
             base.SetLockFactory(new CacheLockFactory(objectCache, string.Format("{0}_{1}", directory, "lock")));
         }

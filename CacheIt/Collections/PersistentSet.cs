@@ -10,7 +10,7 @@ namespace CacheIt.Collections
     /// Wraps methods that mutate state to provide persistence
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class PersistentSetAdapter<T> : ISet<T>
+    public class PersistentSet<T> : ISet<T>
     {
         private ObjectCache objectCache;
         private string key;
@@ -18,19 +18,29 @@ namespace CacheIt.Collections
         private ISet<T> innerSet;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PersistedSet{T}"/> class.
+        /// Initializes a new instance of the <see cref="PersistentSet{T}" /> class.
         /// </summary>
         /// <param name="innerSet">The inner set.</param>
         /// <param name="objectCache">The object cache.</param>
         /// <param name="key">The key.</param>
         /// <param name="region">The region.</param>
-        public PersistentSetAdapter(ISet<T> innerSet, ObjectCache objectCache, string key, string region)
+        public PersistentSet(ISet<T> innerSet, ObjectCache objectCache, string key, string region = null)
         {
             this.objectCache = objectCache;
             this.innerSet = innerSet;
             this.key = key;
             this.region = region;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PersistentSet{T}"/> class.
+        /// </summary>
+        /// <param name="objectCache">The object cache.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="region">The region.</param>
+        public PersistentSet(ObjectCache objectCache, string key, string region = null)
+            : this(new HashSet<T>(), objectCache, key, region)
+        { }
 
         /// <summary>
         /// Refreshes this instance.
