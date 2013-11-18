@@ -56,6 +56,7 @@
     <Compile Include="Store\CacheLock.cs" />
     <Compile Include="Store\CacheLockFactory.cs" />
     <Compile Include="Store\CacheOutputStream.cs" />
+    <Compile Include="Store\LuceneSegmentStream.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CacheIt.Lucene.md" />

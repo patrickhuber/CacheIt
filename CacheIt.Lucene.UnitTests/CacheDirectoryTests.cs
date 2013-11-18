@@ -189,7 +189,16 @@ namespace CacheIt.Lucene.UnitTests
         {
             // create the index
             Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
-            IndexWriter indexWriter = new IndexWriter(directory, analyzer, true, new IndexWriter.MaxFieldLength(25000));
+
+            // remove
+            string fileSystemDirectory = @"C:\x\cacheit";
+            if (System.IO.Directory.Exists(fileSystemDirectory))
+                System.IO.Directory.Delete(fileSystemDirectory, true);
+            var fsDirectory = FSDirectory.Open(fileSystemDirectory);
+            // end remove
+            var testDirectory = directory;
+
+            IndexWriter indexWriter = new IndexWriter(testDirectory, analyzer, true, new IndexWriter.MaxFieldLength(25000));
             Document document = new Document();
             string text = "This is the text to be indexed.";            
             document.Add(new Field("fieldname", text, Field.Store.YES, Field.Index.ANALYZED));
@@ -197,7 +206,7 @@ namespace CacheIt.Lucene.UnitTests
             indexWriter.Dispose();
 
             // search the index
-            IndexSearcher indexSearcher = new IndexSearcher(directory, true);
+            IndexSearcher indexSearcher = new IndexSearcher(testDirectory, true);
             QueryParser parser = new QueryParser(Version.LUCENE_30, "fieldname", analyzer);
             Query query = parser.Parse("text");
             ScoreDoc[] hits = indexSearcher.Search(query, null, 1000).ScoreDocs;

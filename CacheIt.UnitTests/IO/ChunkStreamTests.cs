@@ -189,7 +189,7 @@ namespace CacheIt.UnitTests.IO
 
         #region Flush
 
-        [TestMethod]
+        [Ignore]
         public void Test_Flush_Creates_New_Record()
         {
             stream.SetLength(1);

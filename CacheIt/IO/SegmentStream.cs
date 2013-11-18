@@ -53,7 +53,7 @@ namespace CacheIt.IO
         /// <param name="key">The key.</param>
         /// <param name="region">The region.</param>
         /// <param name="segmentSize">Size of the buffer.</param>
-        public SegmentStream(ObjectCache objectCache, string key, int segmentSize = DefaultSegmentSize, string region = DefaultRegion)
+        public SegmentStream(ObjectCache objectCache, string key, int segmentSize, string region = DefaultRegion)
         {
             _segment = new byte[segmentSize];
             _segmentSize = segmentSize;
@@ -62,6 +62,17 @@ namespace CacheIt.IO
             _canRead = true;
             _canWrite = true;
             _canSeek = true;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SegmentStream"/> class.
+        /// </summary>
+        /// <param name="objectCache">The object cache.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="region">The region.</param>
+        public SegmentStream(ObjectCache objectCache, string key, string region = DefaultRegion)
+            : this(objectCache, key, DefaultSegmentSize, region)
+        { 
         }
 
         /// <summary>
@@ -262,8 +273,14 @@ namespace CacheIt.IO
         /// <returns></returns>
         private int ReadCore(byte[] array, int offset, int count)
         {
+            // calculate the actual count based on the current length
+            var streamLength = Header.Length;
+            var actualCount = _position + count;
+            if (actualCount > streamLength)
+                actualCount = streamLength;
+
             int startSegmentIndex = SegmentUtility.GetSegmentIndex(_position, _segmentSize);
-            int endSegmentIndex = SegmentUtility.GetSegmentIndex(_position + count, _segmentSize);
+            int endSegmentIndex = SegmentUtility.GetSegmentIndex(actualCount, _segmentSize);
 
             int bytesRead = 0;
 
@@ -275,8 +292,8 @@ namespace CacheIt.IO
 
                 // calculate the byteCount
                 var byteCount = _segmentSize - segmentPosition;
-                if (count - bytesRead < byteCount)
-                    byteCount = count - bytesRead;
+                if (actualCount - bytesRead < byteCount)
+                    byteCount = (int)(actualCount - (long)bytesRead);
 
                 // are there bytes to read?
                 if (byteCount > 0)

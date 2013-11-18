@@ -94,7 +94,7 @@ namespace CacheIt.Lucene.Store
 
             // return the stream to the new file
             return new CacheOutputStream(
-                new ChunkStream(this.objectCache, cacheFile.Identifier, region));
+                CreateStream(cacheFile));
         }
 
         /// <summary>
@@ -106,17 +106,17 @@ namespace CacheIt.Lucene.Store
         {
             // get the file key and fetch the file info from the cache
             var fileKey = GenerateFileKey(name);
-            var cacheFile = this.objectCache.Get(fileKey, region);
+            var cacheFile = this.objectCache.Get(fileKey, region) as CacheFile;
 
-            // not be null to continue
+            // must not be null to continue
             if (cacheFile != null)
             {
                 // get the data identifier and remove the data
-                string dataIdentifier = (cacheFile as CacheFile).Identifier;
+                string dataIdentifier = cacheFile.Identifier;
                 if (!string.IsNullOrWhiteSpace(dataIdentifier))
                 {
                     // remove the data
-                    using (var stream = new ChunkStream(this.objectCache, dataIdentifier, region))
+                    using (var stream = CreateStream(cacheFile))
                     {
                         stream.SetLength(0);
                     }
@@ -168,7 +168,7 @@ namespace CacheIt.Lucene.Store
 
             // use the cache file identifier to return a stream that contains the length
             // of the file
-            using(var fileStream = new ChunkStream(this.objectCache, cacheFile.Identifier, region))
+            using(var fileStream = CreateStream(cacheFile))
             {
                 return fileStream.Length;
             }
@@ -219,7 +219,7 @@ namespace CacheIt.Lucene.Store
             var cacheFile = GetCacheFile(name);
             
             // create a chunk stream with the cache file identifier
-            var chunkStream = new ChunkStream(this.objectCache, cacheFile.Identifier, region);
+            var chunkStream = CreateStream(cacheFile);
 
             Trace.WriteLine(string.Format("{0} open for read", name));
 
@@ -273,6 +273,18 @@ namespace CacheIt.Lucene.Store
                         name,
                         directory));
             return cacheFile;
+        }
+
+        /// <summary>
+        /// Creates the stream.
+        /// </summary>
+        /// <param name="cacheFile">The cache file.</param>
+        /// <returns></returns>
+        protected virtual Stream CreateStream(CacheFile cacheFile)
+        {
+            // use the lucene segment stream to disable the checks that invalidate the stream
+            // after it is disposed.
+            return new LuceneSegmentStream(this.objectCache, cacheFile.Identifier);
         }
     }
 }
