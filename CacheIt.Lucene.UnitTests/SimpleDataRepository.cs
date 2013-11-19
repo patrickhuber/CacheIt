@@ -9,6 +9,7 @@ using Lucene.Net.Search;
 
 namespace CacheIt.Lucene.UnitTests
 {
+    
     /// <summary>
     /// <see cref="http://www.codeproject.com/Articles/320219/Lucene-Net-ultra-fast-search-for-MVC-or-WebForms#Step1"/>
     /// </summary>

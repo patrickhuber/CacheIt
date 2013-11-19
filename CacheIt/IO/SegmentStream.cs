@@ -229,8 +229,8 @@ namespace CacheIt.IO
                 if (!CanSeek || count >= _segmentSize)
                 {
                     int bytesRead = ReadCore(array, 0, count);
-                    this._readPosition = 0;
-                    this._readLength = 0;
+                    _readPosition = 0;
+                    _readLength = 0;
                     return bytesRead;
                 }
                 else 
@@ -275,12 +275,12 @@ namespace CacheIt.IO
         {
             // calculate the actual count based on the current length
             var streamLength = Header.Length;
-            var actualCount = _position + count;
-            if (actualCount > streamLength)
-                actualCount = streamLength;
+            var endPosition = _position + count;
+            if (endPosition > streamLength)
+                endPosition = streamLength;
 
             int startSegmentIndex = SegmentUtility.GetSegmentIndex(_position, _segmentSize);
-            int endSegmentIndex = SegmentUtility.GetSegmentIndex(actualCount, _segmentSize);
+            int endSegmentIndex = SegmentUtility.GetSegmentIndex(endPosition, _segmentSize);
 
             int bytesRead = 0;
 
@@ -292,8 +292,8 @@ namespace CacheIt.IO
 
                 // calculate the byteCount
                 var byteCount = _segmentSize - segmentPosition;
-                if (actualCount - bytesRead < byteCount)
-                    byteCount = (int)(actualCount - (long)bytesRead);
+                if (count - bytesRead < byteCount)
+                    byteCount = (int)(count - (long)bytesRead);
 
                 // are there bytes to read?
                 if (byteCount > 0)
@@ -356,7 +356,7 @@ namespace CacheIt.IO
                 FlushWrite(false);
             else if (origin == SeekOrigin.Current)
                 offset -= (long)(_readLength - _readPosition);
-            long relativeOffset = _position + (_readPosition - _readLength);
+            long relativeOffset = _position + (long)(_readPosition - _readLength);
             long position = SeekCore(offset, origin);
 
             if (_readLength > 0)

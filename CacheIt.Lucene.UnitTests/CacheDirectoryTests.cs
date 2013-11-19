@@ -133,31 +133,78 @@ namespace CacheIt.Lucene.UnitTests
             { }
         }
 
-        [Ignore]
-        public void Test_FileSystem_Files_Match_Cache_Files()
+        public void IndexText(Directory directory, string text)
         {
-            // create the cache index
             Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
             IndexWriter indexWriter = new IndexWriter(directory, analyzer, true, new IndexWriter.MaxFieldLength(25000));
             Document document = new Document();
-            string text = "This is the text to be indexed.";
             document.Add(new Field("fieldname", text, Field.Store.YES, Field.Index.ANALYZED));
             indexWriter.AddDocument(document);
             indexWriter.Dispose();
+        }
 
-            // create the filesystem index
-            string fileSystemDirectory = @"C:\x\cacheit";
-            if(System.IO.Directory.Exists(fileSystemDirectory))
+        public Directory CreateFileSystemDirectory(string directory)
+        {
+            string fileSystemDirectory = directory;
+            if (System.IO.Directory.Exists(fileSystemDirectory))
                 System.IO.Directory.Delete(fileSystemDirectory, true);
             var fsDirectory = FSDirectory.Open(fileSystemDirectory);
-            indexWriter = new IndexWriter(fsDirectory, analyzer, true, new IndexWriter.MaxFieldLength(25000));
-            document = new Document();
-            document.Add(new Field("fieldname", text, Field.Store.YES, Field.Index.ANALYZED));
-            indexWriter.AddDocument(document);
-            indexWriter.Dispose();
+            return fsDirectory;
+        }
+
+        public Directory CreateRamDirectory()
+        {
+            return new RAMDirectory();
+        }
+
+        [TestMethod]
+        public void Test_Control_Writer_Write_Matches_Cache_Writer()
+        {
+            Directory controlDirectory = CreateRamDirectory();
+            var controlOutputFile = controlDirectory.CreateOutput("myfile");
+            var cacheOutputFile = directory.CreateOutput("myfile");
+            var fakeText = new ET.FakeText.TextGenerator().GenerateText(1000);
+            var fakeTextBytes = Encoding.ASCII.GetBytes(fakeText);
+
+            for (int i = 0; i < fakeTextBytes.Length;i++)
+            {
+                cacheOutputFile.WriteByte(fakeTextBytes[i]);
+                controlOutputFile.WriteByte(fakeTextBytes[i]);
+            }
+            cacheOutputFile.Dispose();
+            controlOutputFile.Dispose();
+
+            // begin read phase
+            var fsInputFile = controlDirectory.OpenInput("myfile");
+            var cacheInputFile = directory.OpenInput("myfile");
+
+            byte[] cacheBuffer = new byte[fakeTextBytes.Length];
+            byte[] fsBuffer = new byte[fakeTextBytes.Length];
+
+            cacheInputFile.ReadBytes(cacheBuffer, 0, cacheBuffer.Length);
+            fsInputFile.ReadBytes(fsBuffer, 0, fsBuffer.Length);
+
+            for (int b = 0; b < cacheBuffer.Length; b++)
+            {
+                Assert.AreEqual(cacheBuffer[b], fsBuffer[b],
+                    string.Format("Byte {0} expected {1} actual {2}", b, fsBuffer[b], cacheBuffer[b]));
+            }            
+        }
+
+        [TestMethod]
+        public void Test_FileSystem_Files_Match_Cache_Files()
+        {
+            const string text = "This is the text to be indexed.";
+            // create the cache index
+            IndexText(directory, text);
+
+            Directory controlDirectory = CreateRamDirectory();
+
+            // create the filesystem index            
+            IndexText(controlDirectory, text);
 
             var cacheFiles = directory.ListAll().OrderBy(x=>x).ToArray();
-            var fileSystemFiles = fsDirectory.ListAll().OrderBy(x=>x).ToArray();
+            var fileSystemFiles = controlDirectory.ListAll().OrderBy(x=>x).ToArray();
 
             // make sure the file counts match
             Assert.AreEqual(cacheFiles.Length, fileSystemFiles.Length);
@@ -167,17 +214,21 @@ namespace CacheIt.Lucene.UnitTests
                 Assert.AreEqual(cacheFiles[i], fileSystemFiles[i]);
                 string name = cacheFiles[i];
                 var cacheFileStream = directory.OpenInput(name);
-                var fsFileStream = fsDirectory.OpenInput(name);
-                Assert.AreEqual(cacheFileStream.Length(), fsFileStream.Length());
-                int length = Convert.ToInt32(fsFileStream.Length());
+                var controlFileStream = controlDirectory.OpenInput(name);
+                Assert.AreEqual(cacheFileStream.Length(), controlFileStream.Length());
+                int length = Convert.ToInt32(controlFileStream.Length());
                 byte[] cacheBuffer = new byte[length];
                 byte[] fsBuffer = new byte[length];
 
                 cacheFileStream.ReadBytes(cacheBuffer, 0, cacheBuffer.Length);
-                fsFileStream.ReadBytes(fsBuffer, 0, fsBuffer.Length);
+                controlFileStream.ReadBytes(fsBuffer, 0, fsBuffer.Length);
 
                 for (int b = 0; b < cacheBuffer.Length; b++)
                 {
+                    // in the segments file, skip the timestamp
+                    if (name == "segments_2")
+                        if (4 <= b || b <= 11)
+                            break;
                     Assert.AreEqual(cacheBuffer[b], fsBuffer[b], 
                         string.Format("File {0} byte {1} expected {2} actual {3}", name, b, fsBuffer[b], cacheBuffer[b]));
                 }
@@ -187,24 +238,18 @@ namespace CacheIt.Lucene.UnitTests
         [TestMethod]
         public void Test_Create_And_Read_Index()
         {
+            const string TEXT = "This is the text to be indexed.";
+            
             // create the index
             Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
 
             // remove
-            string fileSystemDirectory = @"C:\x\cacheit";
-            if (System.IO.Directory.Exists(fileSystemDirectory))
-                System.IO.Directory.Delete(fileSystemDirectory, true);
-            var fsDirectory = FSDirectory.Open(fileSystemDirectory);
+            var controlDirectory = CreateRamDirectory();
             // end remove
-            var testDirectory = directory;
+            var testDirectory = directory;            
 
-            IndexWriter indexWriter = new IndexWriter(testDirectory, analyzer, true, new IndexWriter.MaxFieldLength(25000));
-            Document document = new Document();
-            string text = "This is the text to be indexed.";            
-            document.Add(new Field("fieldname", text, Field.Store.YES, Field.Index.ANALYZED));
-            indexWriter.AddDocument(document);
-            indexWriter.Dispose();
-
+            IndexText(testDirectory, TEXT);
+            
             // search the index
             IndexSearcher indexSearcher = new IndexSearcher(testDirectory, true);
             QueryParser parser = new QueryParser(Version.LUCENE_30, "fieldname", analyzer);
@@ -213,7 +258,7 @@ namespace CacheIt.Lucene.UnitTests
             Assert.AreEqual(1, hits.Length);
                         
             // iterate through the results
-            string expectedText = string.Copy(text);
+            string expectedText = string.Copy(TEXT);
             for(int i=0;i<hits.Length;i++)
             {
                 Document hitDocument = indexSearcher.Doc(hits[i].Doc);

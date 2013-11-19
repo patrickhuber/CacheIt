@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Lucene.Net.Store;
 using System.IO;
+using System.Diagnostics;
 
 namespace CacheIt.Lucene.Store
 {
@@ -29,6 +30,7 @@ namespace CacheIt.Lucene.Store
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
+            Debug.WriteLine("CacheOutputStream.Dispose(disposing={0})", disposing);
             stream.Dispose();
         }
 
@@ -40,7 +42,11 @@ namespace CacheIt.Lucene.Store
         ///   </seealso>
         public override long FilePointer
         {
-            get { return stream.Position; }
+            get 
+            { 
+                Debug.WriteLine("CacheOutputStream.FilePointer");
+                return stream.Position; 
+            }
         }
 
         /// <summary>
@@ -48,6 +54,7 @@ namespace CacheIt.Lucene.Store
         /// </summary>
         public override void Flush()
         {
+            Debug.WriteLine("CacheOutputStream.Flush()");
             stream.Flush();
         }
 
@@ -56,7 +63,11 @@ namespace CacheIt.Lucene.Store
         /// </summary>
         public override long Length
         {
-            get { return stream.Length; }
+            get
+            {
+                Debug.WriteLine("CacheOutputStream.Length");
+                return stream.Length;
+            }
         }
 
         /// <summary>
@@ -67,6 +78,7 @@ namespace CacheIt.Lucene.Store
         ///   </seealso>
         public override void Seek(long pos)
         {
+            Debug.WriteLine("CacheOutputStream.Seek(pos={0})", pos);
             stream.Seek(pos, SeekOrigin.Begin);
         }
 
@@ -77,7 +89,8 @@ namespace CacheIt.Lucene.Store
         /// <seealso cref="M:Lucene.Net.Store.IndexInput.ReadByte">
         ///   </seealso>
         public override void WriteByte(byte b)
-        {            
+        {
+            Debug.WriteLine("CacheOutputStream.WriteByte(b={0})", b);
             stream.WriteByte(b);
         }
 
@@ -91,6 +104,7 @@ namespace CacheIt.Lucene.Store
         ///   </seealso>
         public override void WriteBytes(byte[] b, int offset, int length)
         {
+            Debug.WriteLine("CacheOutputStream.WriteBytes(b={0}, offset={1}, length={2})", b, offset, length);
             stream.Write(b, offset, length);
         }
     }

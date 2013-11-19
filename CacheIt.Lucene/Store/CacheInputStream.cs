@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using Lucene.Net.Store;
 using System.IO;
+using System.Diagnostics;
 
 namespace CacheIt.Lucene.Store
 {
     /// <summary>
-    /// Output Stream for writing a file to a cache directory
+    /// Output Stream for reading a file from a cache directory
     /// </summary>
     public class CacheInputStream : IndexInput
     {
@@ -29,6 +30,7 @@ namespace CacheIt.Lucene.Store
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected override void Dispose(bool disposing)
         {
+            Debug.WriteLine("CacheInputStream.Dispose(disposing={0})", disposing);
             stream.Dispose();
         }
 
@@ -41,7 +43,11 @@ namespace CacheIt.Lucene.Store
         /// <exception cref="System.NotImplementedException"></exception>
         public override long FilePointer
         {
-            get { return stream.Position; }
+            get
+            {
+                Debug.WriteLine("CacheInputStream.FilePointer");
+                return stream.Position;
+            }
         }
 
         /// <summary>
@@ -50,6 +56,7 @@ namespace CacheIt.Lucene.Store
         /// <returns></returns>
         public override long Length()
         {
+            Debug.WriteLine("CacheInputStream.Length");
             return stream.Length;
         }
 
@@ -61,6 +68,7 @@ namespace CacheIt.Lucene.Store
         ///   </seealso>
         public override byte ReadByte()
         {
+            Debug.WriteLine("CacheInputStream.ReadByte()");
             return (byte)stream.ReadByte();
         }
 
@@ -75,6 +83,7 @@ namespace CacheIt.Lucene.Store
         /// <exception cref="System.NotImplementedException"></exception>
         public override void ReadBytes(byte[] b, int offset, int len)
         {
+            Debug.WriteLine("CacheInputStream.ReadBytes(b={0}, offset={1}, len={2})", b, offset, len);
             stream.Read(b, offset, len);
         }
 
@@ -86,6 +95,7 @@ namespace CacheIt.Lucene.Store
         ///   </seealso>
         public override void Seek(long pos)
         {
+            Debug.WriteLine("CacheInputStream.Seek(pos={0})", pos);
             stream.Seek(pos, SeekOrigin.Begin);
         }
     }

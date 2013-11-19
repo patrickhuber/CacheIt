@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Runtime.Caching;
 using CacheIt.IO;
 using CacheIt;
+using System.IO;
 
 namespace CacheIt.UnitTests.IO
 {
@@ -223,6 +224,37 @@ namespace CacheIt.UnitTests.IO
         }
 
         #endregion SetLength
+
+        #region Write / Seek / Read
+
+        [TestMethod]
+        public void Test_Write_Seek_Read()
+        {
+            string actual = LoremIpsum.ThreeThousandSixtyNineCharacter;
+            byte[] bytes = Encoding.ASCII.GetBytes(actual);
+            stream.Write(bytes, 0, bytes.Length);
+            stream.Seek(0, System.IO.SeekOrigin.Begin);
+            stream.Read(bytes, 0, bytes.Length);
+            Assert.AreEqual(Encoding.ASCII.GetString(bytes), actual);
+        }
+
+        [TestMethod]
+        public void Test_Write_Seek_Read_Seek_Read()
+        {
+            string testString = LoremIpsum.ThreeThousandSixtyNineCharacter;
+            byte[] bytes = Encoding.ASCII.GetBytes(testString);
+            byte[] buffer = new byte[1024];
+            stream.Write(bytes, 0, bytes.Length);
+            stream.Flush();
+            stream.Seek(263, SeekOrigin.Begin);
+            Assert.AreEqual(stream.Read(buffer, 0, 17), 17);
+            Assert.AreEqual(testString.Substring(263, 17), Encoding.ASCII.GetString(buffer, 0, 17));
+            stream.Seek(172, SeekOrigin.Begin);
+            Assert.AreEqual(stream.Read(buffer, 0, 47), 47);
+            Assert.AreEqual(testString.Substring(172, 47), Encoding.ASCII.GetString(buffer, 0, 47));
+        }
+
+        #endregion Write / Seek / Read
 
         private void AssertCacheContentsAreEqualTo(byte[] expected, int offset)
         {
