@@ -352,42 +352,23 @@ namespace CacheIt.IO
                 throw new ArgumentException("Invalid SeekOrigin");
             if (!CanSeek)
                 throw new NotSupportedException("Seek is disabled while disposing");
+            
             if (_writePosition > 0)
-                FlushWrite(false);
-            else if (origin == SeekOrigin.Current)
-                offset -= (long)(_readLength - _readPosition);
-            long relativeOffset = _position + (long)(_readPosition - _readLength);
-            long position = SeekCore(offset, origin);
-
-            if (_readLength > 0)
             {
-                if (relativeOffset == position)
-                {
-                    if (_readPosition > 0)
-                    {
-                        Array.Copy(_segment, _readPosition, _segment, 0, _readLength - _readPosition);
-                        _readLength -= _readPosition;
-                        _readPosition = 0;
-                    }
-                    if (_readLength > 0)
-                        SeekCore(_readLength, SeekOrigin.Current);
-                }
-                else if (relativeOffset - _readPosition < position && position < relativeOffset + _readLength - _readPosition)
-                {
-                    int seekBytes = (int)(position - relativeOffset);
-                    Array.Copy(_segment, _readPosition + seekBytes, _segment, 0, _readLength - (_readPosition + seekBytes));
-                    _readLength -= _readPosition + seekBytes;
-                    _readPosition = 0;
-                    if (_readLength > 0)
-                        SeekCore(_readLength, SeekOrigin.Current);
-                }
-                else 
-                {
-                    _readLength = 0;
-                    _readPosition = 0;
-                }
+                FlushWrite(false);
+                SeekCore(offset, origin);
             }
-            return position;
+
+            if (_readLength - _readPosition > 0 && origin == SeekOrigin.Current)
+                offset -= (long)(_readLength - _readPosition);
+            long position = _position;
+            long seekByteCount = SeekCore(offset, origin);
+            _readPosition = (int) (seekByteCount - (position - (long)_readPosition));
+            if (0 <= _readPosition && _readPosition < _readLength)
+                SeekCore((long)(_readLength - _readPosition), SeekOrigin.Current);
+            else
+                _readPosition = _readLength = 0;
+            return seekByteCount;
         }
 
         /// <summary>
