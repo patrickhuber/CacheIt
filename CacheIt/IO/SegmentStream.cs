@@ -105,6 +105,14 @@ namespace CacheIt.IO
         /// <summary>
         /// Flushes the write.
         /// </summary>
+        private void FlushWrite()
+        {
+            FlushWrite(false);
+        }
+
+        /// <summary>
+        /// Flushes the write.
+        /// </summary>
         /// <param name="calledFromFinalizer">if set to <c>true</c> [called from finalizer].</param>
         private void FlushWrite(bool calledFromFinalizer)
         {
@@ -202,6 +210,47 @@ namespace CacheIt.IO
             }
         }
 
+        public override int Read(byte[] array, int offset, int count)
+        {
+            Assert.IsNotNull(array, "Array parameter is null");
+            Assert.IsFalse(offset < 0, "Offset parameter is less than zero.");
+            Assert.IsFalse(count < 0, "Count parameter is less than zero.");
+            Assert.IsFalse(array.Length - offset < count, "Invalid offset and length, read would exceed bounds of array.");
+
+            if (!CanRead)
+                throw new NotSupportedException("Unable to read while the stream is disposing.");
+
+            int bytesRead = ReadFromSegment(_segment, offset, count);
+            if (bytesRead == count)
+                return bytesRead;
+            int previousBytesRead = bytesRead;
+            if (bytesRead > 0)
+            {
+                count -= bytesRead;
+                offset += bytesRead;
+            }
+            _readPosition = _readLength = 0;
+            if (_writePosition > 0)
+                FlushWrite();
+            if (count >= _segmentSize)
+                return ReadCore(array, offset, count) + previousBytesRead;
+            EnsureSegmentAllocated();
+            _readLength = ReadCore(_segment, 0, _segmentSize);
+            return ReadFromSegment(array, offset, count) + previousBytesRead;
+        }
+
+        private int ReadFromSegment(byte[] array, int offset, int count)
+        {
+            int byteCount = _readLength - _readPosition;
+            if (byteCount == 0)
+                return 0;
+            if (byteCount > count)
+                byteCount = count;
+            Array.Copy(_segment, _readPosition, array, offset, byteCount);
+            _readPosition += byteCount;
+            return byteCount;
+        }
+
         /// <summary>
         /// Reads the specified array.
         /// </summary>
@@ -210,7 +259,7 @@ namespace CacheIt.IO
         /// <param name="count">The count.</param>
         /// <returns></returns>
         /// <exception cref="System.NotImplementedException"></exception>
-        public override int Read(byte[] array, int offset, int count)
+        public int Read2(byte[] array, int offset, int count)
         {
             Assert.IsNotNull(array, "Array parameter is null");
             Assert.IsFalse(offset < 0, "Offset parameter is less than zero.");
@@ -277,7 +326,10 @@ namespace CacheIt.IO
             var streamLength = Header.Length;
             var endPosition = _position + count;
             if (endPosition > streamLength)
+            {
                 endPosition = streamLength;
+                count = (int)((long)streamLength - _position);
+            }
 
             int startSegmentIndex = SegmentUtility.GetSegmentIndex(_position, _segmentSize);
             int endSegmentIndex = SegmentUtility.GetSegmentIndex(endPosition, _segmentSize);
@@ -308,7 +360,27 @@ namespace CacheIt.IO
                     bytesRead += byteCount;
                 }
             }
+            _position += (long)bytesRead;
             return bytesRead;
+        }
+
+        public override int ReadByte()
+        {
+            if (!CanRead)
+                throw new NotSupportedException("Unable to read while the stream is disposing.");
+                
+            if (_readPosition == _readLength)
+            {
+                if (_writePosition > 0)
+                    this.FlushWrite();
+                this.EnsureSegmentAllocated();
+                this._readLength = ReadCore(this._segment, 0, this._segmentSize);
+                this._readPosition = 0;
+            }
+            if (this._readPosition == this._readLength)
+                return -1;
+            else
+                return (int)this._segment[this._readPosition++];
         }
 
         /// <summary>
@@ -317,7 +389,7 @@ namespace CacheIt.IO
         /// <returns>
         /// The unsigned byte cast to an Int32, or -1 if at the end of the stream.
         /// </returns>
-        public override int ReadByte()
+        public int ReadByte2()
         {
             if (_readLength == 0 && !this.CanRead)
                 throw new NotSupportedException("Read not supported while disposing.");
@@ -549,8 +621,7 @@ namespace CacheIt.IO
                     return;
 
                 // allocate the buffer if it does not exist
-                if (_segment == null)
-                    _segment = new byte[_segmentSize];
+                EnsureSegmentAllocated();
 
                 // move the bytes from the array into the buffer
                 System.Array.Copy(array, offset, _segment, _writePosition, count);
@@ -558,6 +629,15 @@ namespace CacheIt.IO
                 // update the write position
                 _writePosition = count;
             }
+        }
+
+        /// <summary>
+        /// Ensures the segment allocated.
+        /// </summary>
+        private void EnsureSegmentAllocated()
+        {
+            if (_segment == null)
+                _segment = new byte[_segmentSize];
         }
 
         /// <summary>
@@ -574,8 +654,7 @@ namespace CacheIt.IO
                     FlushRead();
                 _readPosition = 0;
                 _readLength = 0;
-                if (_segment == null)
-                    _segment = new byte[_segmentSize];                                    
+                EnsureSegmentAllocated();                                 
             }
             if (_writePosition == _segmentSize)
             {

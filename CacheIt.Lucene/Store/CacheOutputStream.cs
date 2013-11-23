@@ -104,7 +104,7 @@ namespace CacheIt.Lucene.Store
         ///   </seealso>
         public override void WriteBytes(byte[] b, int offset, int length)
         {
-            Debug.WriteLine("CacheOutputStream.WriteBytes(b={0}, offset={1}, length={2})", b, offset, length);
+            Debug.WriteLine("CacheOutputStream.WriteBytes(b={0}, offset={1}, length={2})", BitConverter.ToString(b, offset, length), offset, length);
             stream.Write(b, offset, length);
         }
     }

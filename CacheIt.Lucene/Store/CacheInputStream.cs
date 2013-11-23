@@ -68,8 +68,9 @@ namespace CacheIt.Lucene.Store
         ///   </seealso>
         public override byte ReadByte()
         {
-            Debug.WriteLine("CacheInputStream.ReadByte()");
-            return (byte)stream.ReadByte();
+            byte value = (byte)stream.ReadByte();
+            Debug.WriteLine("CacheInputStream.ReadByte() r={0}", value);
+            return value;
         }
 
         /// <summary>
@@ -77,14 +78,14 @@ namespace CacheIt.Lucene.Store
         /// </summary>
         /// <param name="b">the array to read bytes into</param>
         /// <param name="offset">the offset in the array to start storing bytes</param>
-        /// <param name="len">the number of bytes to read</param>
+        /// <param name="length">the number of bytes to read</param>
         /// <seealso cref="M:Lucene.Net.Store.IndexOutput.WriteBytes(System.Byte[],System.Int32)">
         ///   </seealso>
         /// <exception cref="System.NotImplementedException"></exception>
-        public override void ReadBytes(byte[] b, int offset, int len)
+        public override void ReadBytes(byte[] b, int offset, int length)
         {
-            Debug.WriteLine("CacheInputStream.ReadBytes(b={0}, offset={1}, len={2})", b, offset, len);
-            stream.Read(b, offset, len);
+            stream.Read(b, offset, length);
+            Debug.WriteLine("CacheInputStream.ReadBytes(b={0}, offset={1}, len={2})", BitConverter.ToString(b, offset, length), offset, length);            
         }
 
         /// <summary>
