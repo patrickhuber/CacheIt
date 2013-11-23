@@ -220,7 +220,7 @@ namespace CacheIt.IO
             if (!CanRead)
                 throw new NotSupportedException("Unable to read while the stream is disposing.");
 
-            int bytesRead = ReadFromSegment(_segment, offset, count);
+            int bytesRead = ReadFromSegment(array, offset, count);
             if (bytesRead == count)
                 return bytesRead;
             int previousBytesRead = bytesRead;
