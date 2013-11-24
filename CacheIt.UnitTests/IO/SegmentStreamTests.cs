@@ -185,7 +185,7 @@ namespace CacheIt.UnitTests.IO
         #region SetLength
         
         [TestMethod]
-        public void SetLength_0_Removes_All_Segments()
+        public void Test_SetLength_0_Removes_All_Segments()
         {
             var actual = FillCache(1024);
             stream.SetLength(0);
@@ -193,7 +193,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void SetLength_BufferSize_Removes_Correct_Segment()
+        public void Test_SetLength_BufferSize_Removes_Correct_Segment()
         {
             const int TotalSize = 3072;
             var actual = FillCache(TotalSize);
@@ -203,7 +203,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void SetLength_Extend_Adds_Additional_Segments()
+        public void Test_SetLength_Extend_Adds_Additional_Segments()
         {
             const int TotalSize = 1024;
             var actual = FillCache(TotalSize);
@@ -214,7 +214,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void SetLength_Truncate_Removes_Extra_Segments()
+        public void Test_SetLength_Truncate_Removes_Extra_Segments()
         {
             const int TotalSize = 3072;
             var actual = FillCache(TotalSize);
@@ -264,7 +264,8 @@ namespace CacheIt.UnitTests.IO
             Array.Copy(overwrite, 0, buffer, 203, overwrite.Length);
 
             stream.Write(buffer, 0, buffer.Length);
-
+            stream.Flush();
+            stream.Seek(0, SeekOrigin.Begin);
             for (int i = 0; i < 21; i++)
             {
                 var b = stream.ReadByte();
