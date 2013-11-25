@@ -12,7 +12,7 @@ namespace CacheIt.Lucene.UnitTests
     {
 
         [TestMethod]
-        public void Test_Read()
+        public void Test_CacheInputStream_Read()
         {
             string testString = new ET.FakeText.TextGenerator().GenerateText(100);
             byte[] bytes = Encoding.ASCII.GetBytes(testString);

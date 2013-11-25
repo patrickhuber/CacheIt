@@ -53,7 +53,7 @@ namespace CacheIt.UnitTests.IO
         #region Read
         
         [TestMethod]
-        public void Test_Read_Small_Segment()
+        public void Test_SegmentStream_Read_Small_Segment()
         {
             const int TotalSize = 1024;
             var actual = FillCache(TotalSize);
@@ -65,7 +65,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_Read_Large_Array()
+        public void Test_SegmentStream_Read_Large_Array()
         {
             const int TotalSize = 2048;
             var actual = FillCache(TotalSize);
@@ -77,7 +77,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_Read_Byte()
+        public void Test_SegmentStream_Read_Byte()
         {
             var actual = FillCache(1024);
             var readByte = stream.ReadByte();
@@ -89,7 +89,7 @@ namespace CacheIt.UnitTests.IO
         #region Seek
 
         [TestMethod]
-        public void Test_Seek()
+        public void Test_SegmentStream_Seek()
         {
             const int TotalSize = 1024;
             var actual = FillCache(TotalSize);
@@ -99,7 +99,7 @@ namespace CacheIt.UnitTests.IO
 
         #region Write
         [TestMethod]
-        public void Test_Write_Byte()
+        public void Test_SegmentStream_Write_Byte()
         {
             byte byteToWrite = Convert.ToByte('a');
             stream.WriteByte(byteToWrite);
@@ -109,7 +109,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_Write_Large_Array()
+        public void Test_SegmentStream_Write_Large_Array()
         {            
             var bytes = Encoding.ASCII.GetBytes(LoremIpsum.ThreeThousandSixtyNineCharacter);
             stream.Write(bytes, 0, bytes.Length);
@@ -118,7 +118,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_Write_Two_Large_Segments()
+        public void Test_SegmentStream_Write_Two_Large_Segments()
         {
             string twoThousandCharacters = LoremIpsum.OneThousandCharacters + LoremIpsum.OneThousandCharacters;
             var firstSegment = Encoding.ASCII.GetBytes(twoThousandCharacters);
@@ -131,7 +131,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_Write_Small_Segments_Requires_Flush()
+        public void Test_SegmentStream_Write_Small_Segments_Requires_Flush()
         {
             string[] array = { "what", "does", "the", "fox", "say" };
             foreach (var item in array)
@@ -146,7 +146,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_Write_Small_Segments_Totaling_Buffer_Size_Auto_Flushes()
+        public void Test_SegmentStream_Write_Small_Segments_Totaling_Buffer_Size_Auto_Flushes()
         {
             stream = new SegmentStream(cache, Key, SegmentSize, SmallBufferSize);
             string message = LoremIpsum.OneThousandCharacters + " I only need 24 extra characters this is 43";
@@ -170,7 +170,7 @@ namespace CacheIt.UnitTests.IO
 
         #region Length
         [TestMethod]
-        public void Test_Length_Updates_After_Write_And_Flush()
+        public void Test_SegmentStream_Length_Updates_After_Write_And_Flush()
         {
             byte[] buffer = Encoding.ASCII.GetBytes(new string('a', 1024));
             stream.Write(buffer, 0, buffer.Length);
@@ -178,7 +178,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_Length_Updates_After_Small_Write()
+        public void Test_SegmentStream_Length_Updates_After_Small_Write()
         {
             byte[] buffer = Encoding.ASCII.GetBytes(new string('a', 10));
             stream.Write(buffer, 0, buffer.Length);
@@ -189,7 +189,7 @@ namespace CacheIt.UnitTests.IO
         #region SetLength
         
         [TestMethod]
-        public void Test_SetLength_0_Removes_All_Segments()
+        public void Test_SegmentStream_SetLength_0_Removes_All_Segments()
         {
             var actual = FillCache(1024);
             stream.SetLength(0);
@@ -197,7 +197,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_SetLength_BufferSize_Removes_Correct_Segment()
+        public void Test_SegmentStream_SetLength_BufferSize_Removes_Correct_Segment()
         {
             const int TotalSize = 3072;
             var actual = FillCache(TotalSize);
@@ -207,7 +207,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_SetLength_Extend_Adds_Additional_Segments()
+        public void Test_SegmentStream_SetLength_Extend_Adds_Additional_Segments()
         {
             const int TotalSize = 1024;
             var actual = FillCache(TotalSize);
@@ -218,7 +218,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_SetLength_Truncate_Removes_Extra_Segments()
+        public void Test_SegmentStream_SetLength_Truncate_Removes_Extra_Segments()
         {
             const int TotalSize = 3072;
             var actual = FillCache(TotalSize);
@@ -232,7 +232,7 @@ namespace CacheIt.UnitTests.IO
         #region Write / Seek / Read
 
         [TestMethod]
-        public void Test_Write_Seek_Read()
+        public void Test_SegmentStream_Write_Seek_Read()
         {
             string actual = LoremIpsum.ThreeThousandSixtyNineCharacter;
             byte[] bytes = Encoding.ASCII.GetBytes(actual);
@@ -243,7 +243,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_Write_Seek_Read_Seek_Read()
+        public void Test_SegmentStream_Write_Seek_Read_Seek_Read()
         {
             string testString = LoremIpsum.ThreeThousandSixtyNineCharacter;
             byte[] bytes = Encoding.ASCII.GetBytes(testString);
@@ -259,7 +259,7 @@ namespace CacheIt.UnitTests.IO
         }
         
         [TestMethod]
-        public void Test_Write_Then_Read_Switch_Byte_And_Sequence()
+        public void Test_SegmentStream_Write_Then_Read_Switch_Byte_And_Sequence()
         {
             // setup that found a bug in the lucene library, moving here becasue need to prevent regression
             // in the SegmentStream

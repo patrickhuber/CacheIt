@@ -39,14 +39,14 @@ namespace CacheIt.UnitTests.IO
         #endregion TestContext
 
         [TestMethod]
-        public void Test_GenerateSegmentKey()
+        public void Test_SegmentUtility_GenerateSegmentKey()
         {
             string actual = SegmentUtility.GenerateSegmentKey(0, "mykey");
             Assert.AreEqual("mykey_0", actual);
         }
 
         [TestMethod]
-        public void Test_GetPositionInSegment()
+        public void Test_SegmentUtility_GetPositionInSegment()
         {
             int actual = SegmentUtility.GetPositionInSegment(1024, 1024);
             Assert.AreEqual(0, actual);
@@ -59,7 +59,7 @@ namespace CacheIt.UnitTests.IO
         }
 
         [TestMethod]
-        public void Test_GetSegmentIndex()
+        public void Test_SegmentUtility_GetSegmentIndex()
         {
             int actual = SegmentUtility.GetSegmentIndex(0, 1024);
             Assert.AreEqual(0, actual);

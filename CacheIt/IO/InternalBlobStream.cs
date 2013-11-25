@@ -146,8 +146,10 @@ namespace CacheIt.IO
         /// </summary>
         /// <param name="value">The desired length of the current stream in bytes.</param>
         public override void SetLength(long value)
-        {
+        {            
             _memoryStream.SetLength(value);
+            if (value == 0)
+                _cache.Remove(_regionKey.Key, _regionKey.Region);
         }
 
         /// <summary>

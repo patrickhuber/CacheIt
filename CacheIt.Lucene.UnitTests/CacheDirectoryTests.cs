@@ -36,7 +36,7 @@ namespace CacheIt.Lucene.UnitTests
         }
 
         [TestMethod]
-        public void Test_CreateOutput_Creates_Output_Stream()
+        public void Test_CacheDirectory_CreateOutput_Creates_Output_Stream()
         {
             const string FILE = "myfile.txt";
             using (var output = directory.CreateOutput(FILE))
@@ -47,7 +47,7 @@ namespace CacheIt.Lucene.UnitTests
         }
 
         [TestMethod]
-        public void Test_DeleteFile_DeletesFile()
+        public void Test_CacheDirectory_DeleteFile_DeletesFile()
         {
             const string FILE = "myfile.txt";
             CreateFile(FILE);
@@ -59,7 +59,7 @@ namespace CacheIt.Lucene.UnitTests
         }
 
         [TestMethod]
-        public void Test_FileExists_Detects_File()
+        public void Test_CacheDirectory_FileExists_Detects_File()
         {
             const string FILE = "myfile.txt";
             CreateFile(FILE);
@@ -68,7 +68,7 @@ namespace CacheIt.Lucene.UnitTests
         }
 
         [TestMethod]
-        public void Test_FileModified_Returns_Modified_Time()
+        public void Test_CacheDirectory_FileModified_Returns_Modified_Time()
         {
             const string FILE = "myfile.txt";
             CreateFile(FILE);
@@ -79,7 +79,7 @@ namespace CacheIt.Lucene.UnitTests
         }
 
         [TestMethod]
-        public void Test_ListAll_Returns_All_Items()
+        public void Test_CacheDirectory_ListAll_Returns_All_Items()
         {
             const int FILES_LENGTH = 100;
             const string FILE_TEMPLATE = "myfile_{0}.txt";
@@ -94,7 +94,7 @@ namespace CacheIt.Lucene.UnitTests
 
         [TestMethod]
         [ExpectedException(typeof(FileNotFoundException))]
-        public void Test_OpenItem_Throws_FileNotFoundException()
+        public void Test_CacheDirectory_OpenItem_Throws_FileNotFoundException()
         {
             const string FILE = "myfile.txt";
             using (var file = directory.OpenInput(FILE))
@@ -103,7 +103,7 @@ namespace CacheIt.Lucene.UnitTests
         }
 
         [TestMethod]
-        public void Test_OpenInput_Creates_Input_Stream()
+        public void Test_CacheDirectory_OpenInput_Creates_Input_Stream()
         {
             const string FILE = "myfile.txt";
             CreateFile(FILE);
@@ -114,7 +114,7 @@ namespace CacheIt.Lucene.UnitTests
         }
 
         [TestMethod]
-        public void Test_TouchFile_Sets_Modified_Time()
+        public void Test_CacheDirectory_TouchFile_Sets_Modified_Time()
         {
             const string FILE = "myfile.txt";
             CreateFile(FILE);
@@ -158,7 +158,7 @@ namespace CacheIt.Lucene.UnitTests
         }
 
         [TestMethod]
-        public void Test_Control_Writer_Write_Matches_Cache_Writer()
+        public void Test_CacheDirectory_Control_Writer_Write_Matches_Cache_Writer()
         {
             Directory controlDirectory = CreateRamDirectory();
             var controlOutputFile = controlDirectory.CreateOutput("myfile");
@@ -192,7 +192,7 @@ namespace CacheIt.Lucene.UnitTests
         }
 
         [TestMethod]
-        public void Test_FileSystem_Files_Match_Cache_Files()
+        public void Test_CacheDirectory_FileSystem_Files_Match_Cache_Files()
         {
             const string text = "This is the text to be indexed.";
             // create the cache index
@@ -236,7 +236,7 @@ namespace CacheIt.Lucene.UnitTests
         }
 
         [TestMethod]
-        public void Test_Create_And_Read_Index()
+        public void Test_CacheDirectory_Create_And_Read_Index()
         {
             const string TEXT = "This is the text to be indexed.";
             
