@@ -428,7 +428,7 @@ namespace CacheIt.IO
             if (_writePosition > 0)
             {
                 FlushWrite(false);
-                SeekCore(offset, origin);
+                return SeekCore(offset, origin);
             }
 
             if (_readLength - _readPosition > 0 && origin == SeekOrigin.Current)

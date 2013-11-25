@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Web.Mvc", "CacheIt.Web.Mvc\CacheIt.Web.Mvc.csproj", "{5D9E9F32-B179-4DF7-93EF-32A83BB4C281}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Web", "CacheIt.Web\CacheIt.Web.csproj", "{A7439144-1BBE-4CBC-8F33-7AF1BA3897E4}"
@@ -34,10 +36,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Lucene.UnitTests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.IntegrationTests", "CacheIt.IntegrationTests\CacheIt.IntegrationTests.csproj", "{7583EB33-1A09-48F2-8DC4-6D6DA4E41A93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Wacel", "CacheIt.Wacel\CacheIt.Wacel.csproj", "{E837E4E8-04AF-491D-93B8-33F35777E788}"
+EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = CacheIt.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -75,6 +76,10 @@ Global
 		{7583EB33-1A09-48F2-8DC4-6D6DA4E41A93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7583EB33-1A09-48F2-8DC4-6D6DA4E41A93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7583EB33-1A09-48F2-8DC4-6D6DA4E41A93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E837E4E8-04AF-491D-93B8-33F35777E788}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E837E4E8-04AF-491D-93B8-33F35777E788}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E837E4E8-04AF-491D-93B8-33F35777E788}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E837E4E8-04AF-491D-93B8-33F35777E788}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,5 +88,8 @@ Global
 		{8FE6F17E-EC43-4ACB-A740-C13FD96394A1} = {DD1066DC-6128-43F0-98A6-182C7E9419A9}
 		{E1E944E4-3BA8-4A7C-8716-D6A715557E37} = {DD1066DC-6128-43F0-98A6-182C7E9419A9}
 		{7583EB33-1A09-48F2-8DC4-6D6DA4E41A93} = {DD1066DC-6128-43F0-98A6-182C7E9419A9}
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = CacheIt.vsmdi
 	EndGlobalSection
 EndGlobal
