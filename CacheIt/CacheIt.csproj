@@ -46,6 +46,11 @@
     <Compile Include="Collections\PersistentSet.cs" />
     <Compile Include="Configuration\IGlobalConfiguration.cs" />
     <Compile Include="Diagnostics\Assert.cs" />
+    <Compile Include="Index\BPlusInternalNode.cs" />
+    <Compile Include="Index\BPlusLeafNode.cs" />
+    <Compile Include="Index\BPlusNode.cs" />
+    <Compile Include="Index\BPlusTree.cs" />
+    <Compile Include="Index\BPlusNodeType.cs" />
     <Compile Include="Interception\DependencyResolver.cs" />
     <Compile Include="Interception\IDependencyResolver.cs" />
     <Compile Include="IO\BlobStream.cs" />
