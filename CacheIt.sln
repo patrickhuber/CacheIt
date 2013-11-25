@@ -40,6 +40,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Wacel", "CacheIt.Wa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.NCache", "CacheIt.NCache\CacheIt.NCache.csproj", "{751E887B-2588-4A2A-A7BB-C84A34D0E111}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.NHibernate", "CacheIt.NHibernate\CacheIt.NHibernate.csproj", "{F88DC220-0B02-4FC6-8C10-01B9A7104015}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.EntityFramework", "CacheIt.EntityFramework\CacheIt.EntityFramework.csproj", "{0053E4A8-BEEF-4656-A3CD-A3DEF681978B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +90,14 @@ Global
 		{751E887B-2588-4A2A-A7BB-C84A34D0E111}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{751E887B-2588-4A2A-A7BB-C84A34D0E111}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{751E887B-2588-4A2A-A7BB-C84A34D0E111}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F88DC220-0B02-4FC6-8C10-01B9A7104015}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F88DC220-0B02-4FC6-8C10-01B9A7104015}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F88DC220-0B02-4FC6-8C10-01B9A7104015}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F88DC220-0B02-4FC6-8C10-01B9A7104015}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0053E4A8-BEEF-4656-A3CD-A3DEF681978B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0053E4A8-BEEF-4656-A3CD-A3DEF681978B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0053E4A8-BEEF-4656-A3CD-A3DEF681978B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0053E4A8-BEEF-4656-A3CD-A3DEF681978B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
