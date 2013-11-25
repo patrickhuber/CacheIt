@@ -7,7 +7,10 @@ using System.Text;
 
 namespace CacheIt.IO
 {
-    public class InternalSegmentStream : Stream
+    /// <summary>
+    /// An internal implementation used to send and read data from the cache. This stream is unbuffered so users should not use it directly.
+    /// </summary>
+    internal class InternalSegmentStream : Stream
     {
         private ObjectCache _cache;
         private RegionKey _regionKey;
@@ -18,6 +21,13 @@ namespace CacheIt.IO
         private readonly int _segmentSize;
         private long _position;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InternalSegmentStream"/> class.
+        /// </summary>
+        /// <param name="objectCache">The object cache.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="segmentSize">Size of the segment.</param>
+        /// <param name="region">The region.</param>
         public InternalSegmentStream(ObjectCache objectCache, string key, int segmentSize, string region)
         {
             _segmentSize = segmentSize;
@@ -60,25 +70,44 @@ namespace CacheIt.IO
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the current stream supports reading.
+        /// </summary>
+        /// <returns>true if the stream supports reading; otherwise, false.</returns>
         public override bool CanRead
         {
             get { return _canRead; }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the current stream supports seeking.
+        /// </summary>
+        /// <returns>true if the stream supports seeking; otherwise, false.</returns>
         public override bool CanSeek
         {
             get { return _canSeek; }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the current stream supports writing.
+        /// </summary>
+        /// <returns>true if the stream supports writing; otherwise, false.</returns>
         public override bool CanWrite
         {
             get { return _canWrite; }
         }
 
+        /// <summary>
+        /// Clears all buffers for this stream and causes any buffered data to be written to the underlying device.
+        /// </summary>
         public override void Flush()
         {            
         }
 
+        /// <summary>
+        /// When overridden in a derived class, gets the length in bytes of the stream.
+        /// </summary>
+        /// <returns>A long value representing the length of the stream in bytes.</returns>
         public override long Length
         {
             get
@@ -89,6 +118,12 @@ namespace CacheIt.IO
             }
         }
 
+        /// <summary>
+        /// When overridden in a derived class, gets or sets the position within the current stream.
+        /// </summary>
+        /// <returns>The current position within the stream.</returns>
+        /// <exception cref="System.InvalidOperationException">Seek is disabled while disposing.</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">value;Position set value must be non negative</exception>
         public override long Position
         {
             get
@@ -105,6 +140,14 @@ namespace CacheIt.IO
             }
         }
 
+        /// <summary>
+        /// Reads the specified array.
+        /// </summary>
+        /// <param name="array">The array.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="count">The count.</param>
+        /// <returns></returns>
+        /// <exception cref="System.InvalidOperationException"></exception>
         public override int Read(byte[] array, int offset, int count)
         {
             // calculate the actual count based on the current length
@@ -149,6 +192,14 @@ namespace CacheIt.IO
             return bytesRead;
         }
 
+        /// <summary>
+        /// When overridden in a derived class, sets the position within the current stream.
+        /// </summary>
+        /// <param name="offset">A byte offset relative to the <paramref name="origin" /> parameter.</param>
+        /// <param name="origin">A value of type <see cref="T:System.IO.SeekOrigin" /> indicating the reference point used to obtain the new position.</param>
+        /// <returns>
+        /// The new position within the current stream.
+        /// </returns>
         public override long Seek(long offset, SeekOrigin origin)
         {
             var length = Header.Length;
@@ -169,6 +220,10 @@ namespace CacheIt.IO
             return position;
         }
 
+        /// <summary>
+        /// When overridden in a derived class, sets the length of the current stream.
+        /// </summary>
+        /// <param name="value">The desired length of the current stream in bytes.</param>
         public override void SetLength(long value)
         {
             long offset = _position;
@@ -230,6 +285,12 @@ namespace CacheIt.IO
             }
         }
 
+        /// <summary>
+        /// Writes the specified array.
+        /// </summary>
+        /// <param name="array">The array.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="count">The count.</param>
         public override void Write(byte[] array, int offset, int count)
         {
             int startSegmentIndex = SegmentUtility.GetSegmentIndex(_position, _segmentSize);

@@ -45,6 +45,20 @@ namespace CacheIt.IO
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="SegmentStream"/> class.
+        /// </summary>
+        /// <param name="objectCache">The object cache.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="segmentSize">Size of the segment.</param>
+        /// <param name="bufferSize">Size of the buffer.</param>
+        /// <param name="region">The region.</param>
+        public SegmentStream(ObjectCache objectCache, string key, int segmentSize, int bufferSize, string region = DefaultRegion)
+        {
+            bufferedStream = new BufferedStream(
+                new InternalSegmentStream(objectCache, key, segmentSize, region), bufferSize);
+        }
+
+        /// <summary>
         /// Gets a value indicating whether the current stream supports reading.
         /// </summary>
         /// <returns>true if the stream supports reading; otherwise, false.</returns>
