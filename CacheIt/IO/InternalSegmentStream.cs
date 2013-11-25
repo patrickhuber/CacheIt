@@ -8,7 +8,7 @@ using System.Text;
 namespace CacheIt.IO
 {
     /// <summary>
-    /// An internal implementation used to send and read data from the cache. This stream is unbuffered so users should not use it directly.
+    /// An internal implementation used to send and read data from the cache as segments. This stream is unbuffered so users should not use it directly.
     /// </summary>
     internal class InternalSegmentStream : Stream
     {

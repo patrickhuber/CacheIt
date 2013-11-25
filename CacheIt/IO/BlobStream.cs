@@ -7,30 +7,15 @@ using System.Text;
 
 namespace CacheIt.IO
 {
-    /// <summary>
-    /// A segment stream will use chunking to send data to the cache. 
-    /// </summary>
-    public class SegmentStream : Stream
+    public class BlobStream : Stream
     {
+        private const string DefaultRegion = null;        
+
         /// <summary>
         /// The buffered stream used to prevent thrashing of the source cache.
         /// </summary>
         private BufferedStream _bufferedStream;
-
-        public const int DefaultSegmentSize = 1024;
-        public const string DefaultRegion = null;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SegmentStream"/> class.
-        /// </summary>
-        /// <param name="objectCache">The object cache.</param>
-        /// <param name="key">The key.</param>
-        /// <param name="region">The region.</param>
-        public SegmentStream(ObjectCache objectCache, string key, string region = DefaultRegion)
-            : this(objectCache, key, DefaultSegmentSize)
-        { 
-        }
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="SegmentStream"/> class.
         /// </summary>
@@ -38,10 +23,10 @@ namespace CacheIt.IO
         /// <param name="key">The key.</param>
         /// <param name="segmentSize">Size of the segment.</param>
         /// <param name="region">The region.</param>
-        public SegmentStream(ObjectCache objectCache, string key, int segmentSize, string region = DefaultRegion)
+        public BlobStream(ObjectCache objectCache, string key, string region = DefaultRegion)
         {
             _bufferedStream = new BufferedStream(
-                new InternalSegmentStream(objectCache, key, segmentSize, region));
+                new InternalBlobStream(objectCache, key, region));
         }
 
         /// <summary>
@@ -52,10 +37,10 @@ namespace CacheIt.IO
         /// <param name="segmentSize">Size of the segment.</param>
         /// <param name="bufferSize">Size of the buffer.</param>
         /// <param name="region">The region.</param>
-        public SegmentStream(ObjectCache objectCache, string key, int segmentSize, int bufferSize, string region = DefaultRegion)
+        public BlobStream(ObjectCache objectCache, string key, int bufferSize, string region = DefaultRegion)
         {
             _bufferedStream = new BufferedStream(
-                new InternalSegmentStream(objectCache, key, segmentSize, region), bufferSize);
+                new InternalBlobStream(objectCache, key, region), bufferSize);
         }
 
         /// <summary>

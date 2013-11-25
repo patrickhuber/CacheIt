@@ -48,6 +48,8 @@
     <Compile Include="Diagnostics\Assert.cs" />
     <Compile Include="Interception\DependencyResolver.cs" />
     <Compile Include="Interception\IDependencyResolver.cs" />
+    <Compile Include="IO\BlobStream.cs" />
+    <Compile Include="IO\InternalBlobStream.cs" />
     <Compile Include="IO\SegmentStream.cs" />
     <Compile Include="IO\InternalSegmentStream.cs" />
     <Compile Include="IO\IStreamFactory.cs" />

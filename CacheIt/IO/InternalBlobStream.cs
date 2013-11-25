@@ -8,118 +8,114 @@ using System.Text;
 namespace CacheIt.IO
 {
     /// <summary>
-    /// A segment stream will use chunking to send data to the cache. 
+    /// An internal implementation used to send and read data from the cache as a blob. This stream is unbuffered so users should not use it directly.
     /// </summary>
-    public class SegmentStream : Stream
+    internal class InternalBlobStream : Stream
     {
         /// <summary>
-        /// The buffered stream used to prevent thrashing of the source cache.
+        /// The memory stream
         /// </summary>
-        private BufferedStream _bufferedStream;
+        private MemoryStream _memoryStream;
 
-        public const int DefaultSegmentSize = 1024;
+        private ObjectCache _cache;
+        private RegionKey _regionKey;
+
+        /// <summary>
+        /// The default region
+        /// </summary>
         public const string DefaultRegion = null;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SegmentStream"/> class.
+        /// Initializes a new instance of the <see cref="InternalBlobStream"/> class.
         /// </summary>
         /// <param name="objectCache">The object cache.</param>
         /// <param name="key">The key.</param>
         /// <param name="region">The region.</param>
-        public SegmentStream(ObjectCache objectCache, string key, string region = DefaultRegion)
-            : this(objectCache, key, DefaultSegmentSize)
-        { 
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SegmentStream"/> class.
-        /// </summary>
-        /// <param name="objectCache">The object cache.</param>
-        /// <param name="key">The key.</param>
-        /// <param name="segmentSize">Size of the segment.</param>
-        /// <param name="region">The region.</param>
-        public SegmentStream(ObjectCache objectCache, string key, int segmentSize, string region = DefaultRegion)
+        public InternalBlobStream(ObjectCache objectCache, string key, string region = DefaultRegion)
         {
-            _bufferedStream = new BufferedStream(
-                new InternalSegmentStream(objectCache, key, segmentSize, region));
+            _cache = objectCache;
+            _regionKey = new RegionKey { Key = key, Region = region };
+            Initialize();          
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SegmentStream"/> class.
+        /// Initializes this instance. Creates the memory stream and if data exists in the cache it is loaded into the memory stream.
         /// </summary>
-        /// <param name="objectCache">The object cache.</param>
-        /// <param name="key">The key.</param>
-        /// <param name="segmentSize">Size of the segment.</param>
-        /// <param name="bufferSize">Size of the buffer.</param>
-        /// <param name="region">The region.</param>
-        public SegmentStream(ObjectCache objectCache, string key, int segmentSize, int bufferSize, string region = DefaultRegion)
+        private void Initialize()
         {
-            _bufferedStream = new BufferedStream(
-                new InternalSegmentStream(objectCache, key, segmentSize, region), bufferSize);
+            _memoryStream = new MemoryStream();
+            byte[] blob = _cache.Get(_regionKey.Key, _regionKey.Region) as byte[];
+            if (blob != null)
+            {
+                _memoryStream.Write(blob, 0, blob.Length);
+                _memoryStream.Seek(0, SeekOrigin.Begin);
+            }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the current stream supports reading.
+        /// When overridden in a derived class, gets a value indicating whether the current stream supports reading.
         /// </summary>
         /// <returns>true if the stream supports reading; otherwise, false.</returns>
         public override bool CanRead
         {
-            get { return _bufferedStream.CanRead; }
+            get { return _memoryStream.CanRead; }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the current stream supports seeking.
+        /// When overridden in a derived class, gets a value indicating whether the current stream supports seeking.
         /// </summary>
         /// <returns>true if the stream supports seeking; otherwise, false.</returns>
         public override bool CanSeek
         {
-            get { return _bufferedStream.CanSeek; }
+            get { return _memoryStream.CanSeek; }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the current stream supports writing.
+        /// When overridden in a derived class, gets a value indicating whether the current stream supports writing.
         /// </summary>
         /// <returns>true if the stream supports writing; otherwise, false.</returns>
         public override bool CanWrite
         {
-            get { return _bufferedStream.CanWrite; }
+            get { return _memoryStream.CanWrite; }
         }
 
         /// <summary>
-        /// Clears all buffers for this stream and causes any buffered data to be written to the underlying device.
+        /// When overridden in a derived class, clears all buffers for this stream and causes any buffered data to be written to the underlying device.
         /// </summary>
         public override void Flush()
         {
-            _bufferedStream.Flush();
+            _memoryStream.Flush();
+            var array = _memoryStream.ToArray();
+            _cache.Set(_regionKey.Key, array, _regionKey.Region);
         }
 
         /// <summary>
-        /// Gets the length in bytes of the stream.
+        /// When overridden in a derived class, gets the length in bytes of the stream.
         /// </summary>
         /// <returns>A long value representing the length of the stream in bytes.</returns>
         public override long Length
         {
-            get { return _bufferedStream.Length; }
+            get { return _memoryStream.Length; }
         }
 
         /// <summary>
-        /// Gets or sets the position within the current stream.
+        /// When overridden in a derived class, gets or sets the position within the current stream.
         /// </summary>
         /// <returns>The current position within the stream.</returns>
         public override long Position
         {
             get
             {
-                return _bufferedStream.Position;
+                return _memoryStream.Position;
             }
             set
             {
-                _bufferedStream.Position = value;
+                _memoryStream.Position = value;
             }
         }
 
         /// <summary>
-        /// Reads a sequence of bytes from the current stream and advances the position within the stream by the number of bytes read.
+        /// When overridden in a derived class, reads a sequence of bytes from the current stream and advances the position within the stream by the number of bytes read.
         /// </summary>
         /// <param name="buffer">An array of bytes. When this method returns, the buffer contains the specified byte array with the values between <paramref name="offset" /> and (<paramref name="offset" /> + <paramref name="count" /> - 1) replaced by the bytes read from the current source.</param>
         /// <param name="offset">The zero-based byte offset in <paramref name="buffer" /> at which to begin storing the data read from the current stream.</param>
@@ -129,11 +125,11 @@ namespace CacheIt.IO
         /// </returns>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            return _bufferedStream.Read(buffer, offset, count);
+            return _memoryStream.Read(buffer, offset, count);
         }
 
         /// <summary>
-        /// Sets the position within the current stream.
+        /// When overridden in a derived class, sets the position within the current stream.
         /// </summary>
         /// <param name="offset">A byte offset relative to the <paramref name="origin" /> parameter.</param>
         /// <param name="origin">A value of type <see cref="T:System.IO.SeekOrigin" /> indicating the reference point used to obtain the new position.</param>
@@ -142,37 +138,27 @@ namespace CacheIt.IO
         /// </returns>
         public override long Seek(long offset, SeekOrigin origin)
         {
-            return _bufferedStream.Seek(offset, origin);
+            return _memoryStream.Seek(offset, origin);
         }
 
         /// <summary>
-        /// Sets the length of the current stream.
+        /// When overridden in a derived class, sets the length of the current stream.
         /// </summary>
         /// <param name="value">The desired length of the current stream in bytes.</param>
         public override void SetLength(long value)
         {
-            _bufferedStream.SetLength(value);
+            _memoryStream.SetLength(value);
         }
 
         /// <summary>
-        /// Writes a sequence of bytes to the current stream and advances the current position within this stream by the number of bytes written.
+        /// When overridden in a derived class, writes a sequence of bytes to the current stream and advances the current position within this stream by the number of bytes written.
         /// </summary>
         /// <param name="buffer">An array of bytes. This method copies <paramref name="count" /> bytes from <paramref name="buffer" /> to the current stream.</param>
         /// <param name="offset">The zero-based byte offset in <paramref name="buffer" /> at which to begin copying bytes to the current stream.</param>
         /// <param name="count">The number of bytes to be written to the current stream.</param>
         public override void Write(byte[] buffer, int offset, int count)
         {
-            _bufferedStream.Write(buffer, offset, count);
-        }
-
-        /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="T:System.IO.Stream" /> and optionally releases the managed resources.
-        /// </summary>
-        /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-                _bufferedStream.Flush();
+            _memoryStream.Write(buffer, offset, count);
         }
     }
 }
