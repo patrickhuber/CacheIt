@@ -75,12 +75,14 @@ namespace CacheIt.Collections
         {
             Refresh();
             innerSet.ExceptWith(other);
+            Save();
         }
 
         public void IntersectWith(IEnumerable<T> other)
         {
             Refresh();
             innerSet.IntersectWith(other);
+            Save();
         }
 
         public bool IsProperSubsetOf(IEnumerable<T> other)
@@ -123,12 +125,14 @@ namespace CacheIt.Collections
         {
             Refresh();
             innerSet.SymmetricExceptWith(other);
+            Save();
         }
 
         public void UnionWith(IEnumerable<T> other)
         {
             Refresh();
             innerSet.UnionWith(other);
+            Save();
         }
 
         void ICollection<T>.Add(T item)
