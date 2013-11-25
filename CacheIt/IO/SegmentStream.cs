@@ -15,7 +15,7 @@ namespace CacheIt.IO
         public const int DefaultSegmentSize = 1024;
         public const string DefaultRegion = null;
 
-        public SegmentStream(ObjectCache objectCache, string key)
+        public SegmentStream(ObjectCache objectCache, string key, string region = DefaultRegion)
             : this(objectCache, key, DefaultSegmentSize)
         { 
         }
