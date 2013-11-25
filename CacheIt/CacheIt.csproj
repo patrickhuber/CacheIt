@@ -49,6 +49,7 @@
     <Compile Include="Interception\DependencyResolver.cs" />
     <Compile Include="Interception\IDependencyResolver.cs" />
     <Compile Include="IO\SegmentStream.cs" />
+    <Compile Include="IO\InternalSegmentStream.cs" />
     <Compile Include="IO\IChunkStreamHeader.cs" />
     <Compile Include="IO\IStreamFactory.cs" />
     <Compile Include="IO\SegmentStreamHeader.cs" />
