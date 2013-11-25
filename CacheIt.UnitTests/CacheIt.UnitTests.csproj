@@ -49,7 +49,6 @@
     <Compile Include="Diagnostics\AssertTest.cs" />
     <Compile Include="IO\SegmentUtilityTests.cs" />
     <Compile Include="IO\SegmentStreamTests.cs" />
-    <Compile Include="IO\ChunkStreamTests.cs" />
     <Compile Include="LoremIpsum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

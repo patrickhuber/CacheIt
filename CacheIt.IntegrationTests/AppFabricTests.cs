@@ -52,18 +52,18 @@ namespace CacheIt.IntegrationTests
             AppFabricCache appFabricCache = new AppFabricCache(cache);
 
             // create a chunk stream and write the file contents using the chunk stream
-            ChunkStream chunkStream = new ChunkStream(appFabricCache, testFile);
-            using (StreamWriter streamWriter = new StreamWriter(chunkStream))
+            SegmentStream segmentStream = new SegmentStream(appFabricCache, testFile);
+            using (StreamWriter streamWriter = new StreamWriter(segmentStream))
             {
                 streamWriter.Write(expectedFileContents);
             }
 
             // the chunk stream should be disposed (because it implements IDisposable)
-            chunkStream = new ChunkStream(appFabricCache, testFile);
+            segmentStream = new SegmentStream(appFabricCache, testFile);
 
             // create a variable to hold the contents of the current stream
             string actualFileContents = string.Empty;
-            using (StreamReader streamReader = new StreamReader(chunkStream))
+            using (StreamReader streamReader = new StreamReader(segmentStream))
             {
                 actualFileContents = streamReader.ReadToEnd();
             }
@@ -71,8 +71,8 @@ namespace CacheIt.IntegrationTests
             // asser the the expected file contents match the actual file contents
             Assert.AreEqual(expectedFileContents, actualFileContents);
 
-            chunkStream = new ChunkStream(appFabricCache, Key);
-            chunkStream.SetLength(0);
+            segmentStream = new SegmentStream(appFabricCache, Key);
+            segmentStream.SetLength(0);
             appFabricCache.Remove(Key);
         }
     }
