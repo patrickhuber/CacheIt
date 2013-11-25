@@ -26,25 +26,11 @@ namespace CacheIt.Lucene.UnitTests
         private static SimpleDataIndex simpleDataIndex;
 
         static SimpleDataRepository()
-        {
-            const bool USE_FILESYSTEM = false;
+        {            
             const string DIRECTORY = "C:\\x\\cacheit";
 
             var objectCache = new MemoryCache("{7D8DAD94-A0EF-4168-ACB5-2574DC000F26}");
-            Directory directory = null;
-
-            if (USE_FILESYSTEM)
-            {
-                if (System.IO.Directory.Exists(DIRECTORY))
-                    System.IO.Directory.Delete(DIRECTORY, true);
-                System.IO.Directory.CreateDirectory(DIRECTORY);
-                directory = FSDirectory.Open(DIRECTORY);
-            }
-            else 
-            { 
-                directory = new CacheDirectory(objectCache, DIRECTORY);
-            }            
-            
+            Directory directory = new CacheDirectory(objectCache, DIRECTORY);                     
             simpleDataIndex = new SimpleDataIndex(Items, directory);
         }
 

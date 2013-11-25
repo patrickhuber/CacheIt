@@ -19,12 +19,13 @@ namespace CacheIt.UnitTests.IO
         private ObjectCache cache;
         private SegmentStream stream;
         private const string Key = "mykey";
-        private const int BufferSize = 1024;
+        private const int SegmentSize = 1024;
+        private const int SmallBufferSize = 1024;
 
         public SegmentStreamTests()
         {            
             cache = new MemoryCache("BufferedCacheStreamTests");
-            stream = new SegmentStream(cache, Key, BufferSize);
+            stream = new SegmentStream(cache, Key, SegmentSize);
         }
 
         #region  TestContext
@@ -112,7 +113,7 @@ namespace CacheIt.UnitTests.IO
         {            
             var bytes = Encoding.ASCII.GetBytes(LoremIpsum.ThreeThousandSixtyNineCharacter);
             stream.Write(bytes, 0, bytes.Length);
-
+            stream.Flush();
             AssertCacheContentsAreEqualTo(bytes, 0);
         }
 
@@ -124,6 +125,7 @@ namespace CacheIt.UnitTests.IO
             var secondSegment = Encoding.ASCII.GetBytes(twoThousandCharacters);
             stream.Write(firstSegment, 0, firstSegment.Length);
             stream.Write(secondSegment, 0, secondSegment.Length);
+            stream.Flush();
             AssertCacheContentsAreEqualTo(firstSegment, 0);
             AssertCacheContentsAreEqualTo(secondSegment, firstSegment.Length);
         }
@@ -146,6 +148,7 @@ namespace CacheIt.UnitTests.IO
         [TestMethod]
         public void Test_Write_Small_Segments_Totaling_Buffer_Size_Auto_Flushes()
         {
+            stream = new SegmentStream(cache, Key, SegmentSize, SmallBufferSize);
             string message = LoremIpsum.OneThousandCharacters + " I only need 24 extra characters this is 43";
             string[] array = message.Split(' ');
             int bytesWritten = 0;
@@ -156,6 +159,7 @@ namespace CacheIt.UnitTests.IO
                 stream.WriteByte((byte)' ');
                 bytesWritten += buffer.Length + 1;
             }
+
             byte[] bytes = cache.Get(SegmentUtility.GenerateSegmentKey(0, Key)) as byte[];
             Assert.IsNotNull(bytes);
             bytes = cache.Get(SegmentUtility.GenerateSegmentKey(1, Key)) as byte[];
@@ -280,14 +284,14 @@ namespace CacheIt.UnitTests.IO
 
         private void AssertCacheContentsAreEqualTo(byte[] expected, int offset)
         {
-            for (int index = offset; index < expected.Length; index += BufferSize)
+            for (int index = offset; index < expected.Length; index += SegmentSize)
             {
-                int segmentIndex = SegmentUtility.GetSegmentIndex(index, BufferSize);
+                int segmentIndex = SegmentUtility.GetSegmentIndex(index, SegmentSize);
                 var buffer = cache.Get(SegmentUtility.GenerateSegmentKey(segmentIndex, Key)) as byte[];
                 Assert.IsNotNull(buffer);
-                for (int b = 0; b < buffer.Length && index * BufferSize + b < expected.Length; b++)
+                for (int b = 0; b < buffer.Length && index * SegmentSize + b < expected.Length; b++)
                 {
-                    Assert.AreEqual(buffer[b], expected[index * BufferSize + b]);
+                    Assert.AreEqual(buffer[b], expected[index * SegmentSize + b]);
                 }
             }
         }
@@ -307,43 +311,43 @@ namespace CacheIt.UnitTests.IO
                 actual += LoremIpsum.ThreeThousandSixtyNineCharacter.Substring(0, remainder);
 
             // break the blob into buffers
-            int startIndex = SegmentUtility.GetSegmentIndex(0, BufferSize);
-            int endIndex = SegmentUtility.GetSegmentIndex(size <= 0 ? 0 : size - 1, BufferSize);
+            int startIndex = SegmentUtility.GetSegmentIndex(0, SegmentSize);
+            int endIndex = SegmentUtility.GetSegmentIndex(size <= 0 ? 0 : size - 1, SegmentSize);
                         
             for (int i = startIndex; i <= endIndex; i++)
             {
-                byte[] buffer = new byte[BufferSize];
-                int offset = i * BufferSize;
-                int count = BufferSize;
+                byte[] buffer = new byte[SegmentSize];
+                int offset = i * SegmentSize;
+                int count = SegmentSize;
                 if (offset + count > size)
                     count = size - offset;
                 byte[] bytes = Encoding.ASCII.GetBytes(actual.Substring(offset, count));
                 Array.Copy(bytes, buffer, count);
                 cache.Set(SegmentUtility.GenerateSegmentKey(i, Key), buffer);
             }
-            cache.Set(Key, new SegmentStreamHeader(BufferSize) { Length = size });
+            cache.Set(Key, new SegmentStreamHeader(SegmentSize) { Length = size });
             return actual;
         }
 
         private void FillCache(byte[] bytes)
         {
             int size = bytes.Length;
-            int startIndex = SegmentUtility.GetSegmentIndex(0, BufferSize);
-            int endIndex = SegmentUtility.GetSegmentIndex(size <= 0 ? 0 : size - 1, BufferSize);
+            int startIndex = SegmentUtility.GetSegmentIndex(0, SegmentSize);
+            int endIndex = SegmentUtility.GetSegmentIndex(size <= 0 ? 0 : size - 1, SegmentSize);
 
             int bytesRead = 0;
             for (int i = startIndex; i <= endIndex; i++)
             {
-                byte[] buffer = new byte[BufferSize];
-                int offset = i * BufferSize;
-                int count = BufferSize;
+                byte[] buffer = new byte[SegmentSize];
+                int offset = i * SegmentSize;
+                int count = SegmentSize;
                 if (offset + count > size)
                     count = size - offset;
                 Array.Copy(bytes, bytesRead, buffer, 0, count);
                 bytesRead += count;
                 cache.Set(SegmentUtility.GenerateSegmentKey(i, Key), buffer);
             }
-            cache.Set(Key, new SegmentStreamHeader(BufferSize) { Length = size });
+            cache.Set(Key, new SegmentStreamHeader(SegmentSize) { Length = size });
         }
     }
 }
