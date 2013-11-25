@@ -324,5 +324,26 @@ namespace CacheIt.UnitTests.IO
             cache.Set(Key, new SegmentStreamHeader(BufferSize) { Length = size });
             return actual;
         }
+
+        private void FillCache(byte[] bytes)
+        {
+            int size = bytes.Length;
+            int startIndex = SegmentUtility.GetSegmentIndex(0, BufferSize);
+            int endIndex = SegmentUtility.GetSegmentIndex(size <= 0 ? 0 : size - 1, BufferSize);
+
+            int bytesRead = 0;
+            for (int i = startIndex; i <= endIndex; i++)
+            {
+                byte[] buffer = new byte[BufferSize];
+                int offset = i * BufferSize;
+                int count = BufferSize;
+                if (offset + count > size)
+                    count = size - offset;
+                Array.Copy(bytes, bytesRead, buffer, 0, count);
+                bytesRead += count;
+                cache.Set(SegmentUtility.GenerateSegmentKey(i, Key), buffer);
+            }
+            cache.Set(Key, new SegmentStreamHeader(BufferSize) { Length = size });
+        }
     }
 }
