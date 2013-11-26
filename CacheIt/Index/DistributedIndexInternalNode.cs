@@ -29,7 +29,9 @@ namespace CacheIt.Index
 
         public DistributedIndexInternalNode(int order)
             : base(order)
-        { }
+        { 
+        
+        }
 
         /// <summary>
         /// Gets a value indicating whether [is leaf].
