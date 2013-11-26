@@ -47,5 +47,17 @@ namespace CacheIt.Index
         {
             get { return BPlusNodeType.Internal; }
         }
+
+        public IEnumerable<string> ChildNodes
+        {
+            get { return _childNodes; }
+        }
+
+        public BPlusNode<TKey, TPointer> GetChildAt(int index)
+        {
+            var childKey = _childNodes[index];
+            var item = cache.Get(childKey, regionKey.Key) as BPlusNode<TKey, TPointer>;
+            return item;
+        }
     }
 }

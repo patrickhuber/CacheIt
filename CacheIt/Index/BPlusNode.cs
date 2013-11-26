@@ -49,12 +49,10 @@ namespace CacheIt.Index
         }
 
         public abstract BPlusNodeType NodeType { get; }
-        
-        public BPlusNode<TKey, TPointer> Search(TKey key)
-        {
-            if (NodeType == BPlusNodeType.Leaf)
-                return this;
 
+        public IEnumerable<TKey> Keys
+        {
+            get { return keys; }
         }
     }
 }
