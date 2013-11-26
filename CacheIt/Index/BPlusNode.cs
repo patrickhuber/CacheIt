@@ -54,5 +54,10 @@ namespace CacheIt.Index
         {
             get { return keys; }
         }
+
+        public bool IsFull()
+        {
+            return keys.Count >= degree - 1;
+        }
     }
 }

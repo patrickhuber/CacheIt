@@ -53,6 +53,10 @@
     <Compile Include="Index\BPlusNode.cs" />
     <Compile Include="Index\BPlusTree.cs" />
     <Compile Include="Index\BPlusNodeType.cs" />
+    <Compile Include="Index\DistributedIndex.cs" />
+    <Compile Include="Index\DistributedIndexInternalNode.cs" />
+    <Compile Include="Index\DistributedIndexLeafNode.cs" />
+    <Compile Include="Index\DistributedIndexNode.cs" />
     <Compile Include="Interception\DependencyResolver.cs" />
     <Compile Include="Interception\IDependencyResolver.cs" />
     <Compile Include="IO\BlobStream.cs" />

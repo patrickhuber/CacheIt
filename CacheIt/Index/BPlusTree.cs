@@ -30,7 +30,7 @@ namespace CacheIt.Index
             int i = 0;
             foreach(var nodeKey in internalNode.Keys)
             {
-                if (key.CompareTo(nodeKey) < 0)
+                if (key.CompareTo(nodeKey) <= 0)
                 {
                     return Search(key, internalNode.GetChildAt(i));
                 }
@@ -38,5 +38,16 @@ namespace CacheIt.Index
             }
             return Search(key, internalNode.GetChildAt(i + 1));
         }
+
+        public void Insert(TKey key, TPointer pointer)
+        {
+            var node = Search(key);
+
+        }
+
+        public void Delete(TKey key)
+        { }
+        public void Delete(TKey key, TPointer pointer)
+        { }
     }
 }

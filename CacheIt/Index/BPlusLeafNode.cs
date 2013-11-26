@@ -13,7 +13,7 @@ namespace CacheIt.Index
         where TPointer : IEquatable<TPointer>
     {
         // this structure will handle duplicate keys through a sub BPlusTree structure
-        private BPlusTree<int, TPointer> _pointers;
+        private IList<IList<TPointer>> _pointers;
         private string _siblingNodeAddress;
 
         public BPlusLeafNode(ObjectCache objectCache, int degree, string key, string region = null)
@@ -39,13 +39,32 @@ namespace CacheIt.Index
         protected override void Initialize()
         {
  	         base.Initialize();
-             _pointers = new BPlusTree<int, TPointer>(cache, degree, regionKey.Key, regionKey.Region);
+             _pointers = new List<IList<TPointer>>();
+             for (int i = 0; i < degree; i++)
+             {
+                 _pointers.Add(new List<TPointer>());
+             }
              _siblingNodeAddress = Guid.NewGuid().ToString();
         }
 
         public override BPlusNodeType NodeType
         {
             get { return BPlusNodeType.Leaf; }
+        }
+
+        public void Insert(TKey key, TPointer pointer)
+        {
+            int i = 0;
+            for (; i < keys.Count; i++)
+            {
+                if (key.CompareTo(keys[i]) <= 0)
+                {
+                    break;
+                }
+            }
+            
+            var _pointerList = _pointers[i];
+            
         }
     }
 }
