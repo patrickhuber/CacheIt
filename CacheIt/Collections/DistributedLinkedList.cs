@@ -11,7 +11,7 @@ namespace CacheIt.Collections
         private RegionKey _regionKey;
         private ObjectCache _cache;
 
-        private class CacheLinkedListHeader
+        private class DistributedLinkedListHeader
         {
             public int Count { get; set; }
             public string HeadPointer { get; set; }
@@ -203,11 +203,11 @@ namespace CacheIt.Collections
             yield break;
         }
 
-        private CacheLinkedListHeader Header
+        private DistributedLinkedListHeader Header
         {
             get
             {
-                return _cache.Get(_regionKey.Key, _regionKey.Region) as CacheLinkedListHeader;
+                return _cache.Get(_regionKey.Key, _regionKey.Region) as DistributedLinkedListHeader;
             }
             set
             {
