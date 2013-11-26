@@ -43,8 +43,8 @@
   <ItemGroup>
     <Compile Include="CacheBase.cs" />
     <Compile Include="CacheEntryChangeMonitorBase.cs" />
-    <Compile Include="Collections\CacheLinkedList.cs" />
-    <Compile Include="Collections\CacheLinkedListNode.cs" />
+    <Compile Include="Collections\DistributedLinkedList.cs" />
+    <Compile Include="Collections\DistributedLinkedListNode.cs" />
     <Compile Include="Collections\PersistentSet.cs" />
     <Compile Include="Configuration\IGlobalConfiguration.cs" />
     <Compile Include="Diagnostics\Assert.cs" />
