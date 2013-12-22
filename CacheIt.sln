@@ -46,6 +46,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.EntityFramework", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Memcached", "CacheIt.Memcached\CacheIt.Memcached.csproj", "{B242A197-89A5-4DF7-82B5-DB27FB3CE78E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Redis", "CacheIt.Redis\CacheIt.Redis.csproj", "{3E1F5CED-55A1-4F22-BA43-65C14B81B71C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,10 @@ Global
 		{B242A197-89A5-4DF7-82B5-DB27FB3CE78E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B242A197-89A5-4DF7-82B5-DB27FB3CE78E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B242A197-89A5-4DF7-82B5-DB27FB3CE78E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E1F5CED-55A1-4F22-BA43-65C14B81B71C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E1F5CED-55A1-4F22-BA43-65C14B81B71C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E1F5CED-55A1-4F22-BA43-65C14B81B71C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E1F5CED-55A1-4F22-BA43-65C14B81B71C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
