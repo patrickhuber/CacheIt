@@ -61,6 +61,15 @@ namespace CacheIt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Change Monitors are not supported by this implementation..
+        /// </summary>
+        internal static string ChangeMonitorsNotSupported {
+            get {
+                return ResourceManager.GetString("ChangeMonitorsNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The cache key is invalid..
         /// </summary>
         internal static string InvalidCacheKeyMessage {

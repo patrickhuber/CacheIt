@@ -50,6 +50,7 @@
     <Compile Include="Diagnostics\Assert.cs" />
     <Compile Include="Interception\DependencyResolver.cs" />
     <Compile Include="Interception\IDependencyResolver.cs" />
+    <Compile Include="IObjectCache.cs" />
     <Compile Include="Ioc\DependencyResolver.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -66,6 +67,7 @@
     <Compile Include="IO\IStreamFactory.cs" />
     <Compile Include="IO\SegmentStreamHeader.cs" />
     <Compile Include="IO\SegmentUtility.cs" />
+    <Compile Include="ObjectCacheAdapter.cs" />
     <Compile Include="ObjectCacheExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Diagnostics\DiagnosticStrings.Designer.cs">

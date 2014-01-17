@@ -14,7 +14,7 @@ namespace CacheIt.Web
     public class SessionCache
         : CacheBase
     {
-        private HttpContext httpContext;
+        private IHttpContext httpContext;
 
         protected virtual string GetSessionKey(string variable)
         {
@@ -55,17 +55,17 @@ namespace CacheIt.Web
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionCache"/> class.
         /// </summary>
-        public SessionCache()
+        public SessionCache(IHttpContext httpContext)
         {
-            this.httpContext = HttpContext.Current;
-            AssertPreConditions(httpContext);
+            this.httpContext = httpContext;
+            AssertPreConditions(this.httpContext);
             var keys = new List<string>();
         }
         
         /// <summary>
         /// Asserts the pre conditions.
         /// </summary>
-        protected virtual void AssertPreConditions(HttpContext httpContext)
+        protected virtual void AssertPreConditions(IHttpContext httpContext)
         {
             Assert.IsNotNull(httpContext, Strings.HttpContextIsNullExceptionMessage);
             Assert.IsNotNull(httpContext.Session, Strings.SessionIsNullException);
@@ -73,19 +73,20 @@ namespace CacheIt.Web
         
         public override bool Contains(string key, string regionName = null)
         {
-            throw new NotImplementedException();
+            AssertRegionNameIsSupported(regionName);
+            return httpContext.Session.Contains(key);
         }
 
         public override System.Runtime.Caching.CacheEntryChangeMonitor CreateCacheEntryChangeMonitor(IEnumerable<string> keys, string regionName = null)
         {
-            throw new NotImplementedException();
+            AssertChangeMonitorIsSupported();
+            return null;
         }
 
         public override System.Runtime.Caching.DefaultCacheCapabilities DefaultCacheCapabilities
         {
-            get { throw new NotImplementedException(); }
+            get { return DefaultCacheCapabilities.None; }
         }
-
         
         public override System.Runtime.Caching.CacheItem GetCacheItem(string key, string regionName = null)
         {
@@ -94,7 +95,7 @@ namespace CacheIt.Web
 
         public override long GetCount(string regionName = null)
         {
-            throw new NotImplementedException();
+            return httpContext.Session.Count;
         }
 
         protected override IEnumerator<KeyValuePair<string, object>> GetEnumerator()
@@ -109,17 +110,15 @@ namespace CacheIt.Web
 
         public override object Remove(string key, string regionName = null)
         {
-            throw new NotImplementedException();
+            AssertRegionNameIsSupported(regionName);
+            var instance = Get(key, regionName);
+            httpContext.Session.Remove(key);
+            return instance;
         }
 
         public override void Set(System.Runtime.Caching.CacheItem item, System.Runtime.Caching.CacheItemPolicy policy)
         {
-            throw new NotImplementedException();
+            httpContext.Session[item.Key] = item;
         }
-        
-        /// <summary>
-        /// The default session cache instance
-        /// </summary>
-        public static SessionCache Default = new SessionCache();
     }
 }

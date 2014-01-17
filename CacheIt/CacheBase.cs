@@ -134,7 +134,17 @@ namespace CacheIt
             if ((DefaultCacheCapabilities & System.Runtime.Caching.DefaultCacheCapabilities.CacheRegions) != 0)
                 throw new NotSupportedException(Strings.RegionNameNotSupported);            
         }
-        
+
+        /// <summary>
+        /// Asserts the change monitor is supported.
+        /// </summary>
+        /// <exception cref="System.NotSupportedException"></exception>
+        protected void AssertChangeMonitorIsSupported()
+        {
+            if ((DefaultCacheCapabilities & DefaultCacheCapabilities.CacheEntryChangeMonitors) != 0)
+                throw new NotSupportedException(Strings.ChangeMonitorsNotSupported);
+        }
+
         /// <summary>
         /// When overridden in a derived class, inserts a cache entry into the cache.
         /// </summary>
