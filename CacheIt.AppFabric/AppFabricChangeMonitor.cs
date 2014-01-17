@@ -8,7 +8,8 @@ using System.Text;
 namespace CacheIt.AppFabric
 {
     /// <summary>
-    /// <see cref="http://msdn.microsoft.com/en-us/library/ee790841(v=azure.10).aspx"/>
+    /// Provides an AppFabricChangeMonitor
+    /// <see cref="http://msdn.microsoft.com/en-us/library/hh334296(v=azure.10).aspx"/>
     /// </summary>
     public sealed class AppFabricChangeMonitor : CacheEntryChangeMonitorBase, IDisposable
     {
@@ -18,7 +19,7 @@ namespace CacheIt.AppFabric
         public AppFabricChangeMonitor(ReadOnlyCollection<string> keys, string regionName, DataCache dataCache)
             : base(keys, regionName) 
         {
-            this.dataCache = dataCache;
+            this.dataCache = dataCache;            
             this.notificationDescriptorList = new List<DataCacheNotificationDescriptor>();
 
             foreach (var key in keys)

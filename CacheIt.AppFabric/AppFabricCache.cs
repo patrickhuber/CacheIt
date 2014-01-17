@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.ApplicationServer.Caching;
 using System.Runtime.Caching;
+using System.Collections.ObjectModel;
 
 namespace CacheIt.AppFabric
 {
@@ -59,9 +60,12 @@ namespace CacheIt.AppFabric
         /// A change monitor that monitors cache entries in the cache.
         /// </returns>
         /// <exception cref="System.NotImplementedException"></exception>
-        public override System.Runtime.Caching.CacheEntryChangeMonitor CreateCacheEntryChangeMonitor(IEnumerable<string> keys, string regionName = null)
+        public override CacheEntryChangeMonitor CreateCacheEntryChangeMonitor(IEnumerable<string> keys, string regionName = null)
         {
-            throw new NotImplementedException();
+            return new AppFabricChangeMonitor(
+                new ReadOnlyCollection<string>(keys.ToList()), 
+                regionName, 
+                this.cache);
         }
 
         /// <summary>
