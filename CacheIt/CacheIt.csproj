@@ -48,11 +48,6 @@
     <Compile Include="Collections\PersistentSet.cs" />
     <Compile Include="Configuration\IGlobalConfiguration.cs" />
     <Compile Include="Diagnostics\Assert.cs" />
-    <Compile Include="Index\DistributedIndex.cs" />
-    <Compile Include="Index\DistributedIndexInternalNode.cs" />
-    <Compile Include="Index\DistributedIndexLeafNode.cs" />
-    <Compile Include="Index\DistributedIndexNode.cs" />
-    <Compile Include="Index\IndexTree.cs" />
     <Compile Include="Interception\DependencyResolver.cs" />
     <Compile Include="Interception\IDependencyResolver.cs" />
     <Compile Include="Ioc\DependencyResolver.cs">
