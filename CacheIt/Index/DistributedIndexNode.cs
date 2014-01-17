@@ -105,17 +105,28 @@ namespace CacheIt.Index
             if (index < 0)
             {
                 // perform an ordered insert
-                index = keys.Count;
-                for (int i = 0; i < keys.Count; i++)
-                {
-                    if (key.CompareTo(keys[i]) < 0)
-                    {
-                        index = i;
-                        break;
-                    }
-                }
+                index = FindIndex(key);
                 keys.Insert(index, key);
                 OnInsertIndexFound(key, pointer, index);
+            }
+            return index;
+        }
+
+        /// <summary>
+        /// Finds the index.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        public int FindIndex(TKey key)
+        {
+            var index = keys.Count;
+            for (int i = 0; i < keys.Count; i++)
+            {
+                if (key.CompareTo(keys[i]) < 0)
+                {
+                    index = i;
+                    break;
+                }
             }
             return index;
         }

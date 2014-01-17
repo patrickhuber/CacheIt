@@ -24,13 +24,32 @@ namespace CacheIt.Index
         /// <param name="cacheRegion">The cache region.</param>
         public DistributedIndexInternalNode(int order, string cacheKey, string cacheRegion = null)
             : base(order, cacheKey, cacheRegion)
-        { 
+        {
+            _children = new List<string>();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DistributedIndexInternalNode{TKey, TPointer}"/> class.
+        /// </summary>
+        /// <param name="order">The order.</param>
         public DistributedIndexInternalNode(int order)
             : base(order)
-        { 
-        
+        {
+            _children = new List<string>();
+        }
+
+        /// <summary>
+        /// Gets the child address.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        public string GetChildAddress(int index)
+        {
+            if (index >= _children.Count || index < 0)
+                throw new ArgumentException(
+                    string.Format("Invalid index {0}. Index must be between 0 and {1}", index, _children.Count));
+            return _children[index];
         }
 
         /// <summary>
@@ -55,6 +74,28 @@ namespace CacheIt.Index
             {
                 var internalNode = overflow as DistributedIndexInternalNode<TKey, TPointer>;
             }
+        }
+
+        /// <summary>
+        /// Merges the specified other.
+        /// </summary>
+        /// <param name="other">The other.</param>
+        /// <returns></returns>
+        public override bool Merge(DistributedIndexNode<TKey, TPointer> other)
+        {
+            var result = base.Merge(other);
+            if (!IsLeaf)
+            {
+                var internalNode = other as DistributedIndexInternalNode<TKey, TPointer>;
+                
+                // after the movement we need to grab the last child aka, the 'infinity' pointer
+                if (internalNode._children.Count > 0)
+                {
+                    _children.Add(internalNode._children[0]);
+                    internalNode._children.RemoveAt(0);
+                }
+            }
+            return result;
         }
 
         protected override void OnMergeKeyMoved(DistributedIndexNode<TKey, TPointer> other, int index)

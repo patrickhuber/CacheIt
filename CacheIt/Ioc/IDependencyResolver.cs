@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CacheIt.Index
+namespace CacheIt.Ioc
 {
-    public enum BPlusNodeType
+    public interface IDependencyResolver
     {
-        Leaf = 0,
-        Internal
+        T GetService<T>();
     }
 }

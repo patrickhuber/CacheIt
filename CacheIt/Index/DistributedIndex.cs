@@ -42,20 +42,50 @@ namespace CacheIt.Index
         /// Inserts the specified key in the index storing the address in the root.
         /// </summary>
         /// <param name="key">The key.</param>
-        /// <param name="address">The address.</param>
+        /// <param name="pointer">The address.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        public void Insert(TKey key, TPointer address)
+        public void Insert(TKey key, TPointer pointer)
         {
-            InsertRecursive(key, address, _root);
+            InsertRecursive(key, pointer, _root);
+
+            // check for full root. if full, split
+            if (_root.IsFull())
+            {
+                // root is a leaf node, 
+                // split to other leaf
+                // create internal node as new root
+                if (_root.IsLeaf)
+                { 
+                }
+                // root is internal node.
+                // split to other internal
+                // create internal as new root
+                else
+                {
+                }
+            }
         }
 
-        private void InsertRecursive(TKey key, TPointer address, DistributedIndexLeafNode<TKey, TPointer> node)
+        private void InsertRecursive(TKey key, TPointer pointer, DistributedIndexNode<TKey, TPointer> node)
         {
             if (node.IsLeaf)
             {
-                node.Insert(key, address);
+                node.Insert(key, pointer);
                 return;
             }
+            
+            // find the index
+            var index = node.FindIndex(key);
+            
+            // if the key is greater than the largest key, we have a new largest key            
+            if (key.CompareTo(node.GetLargestKey()) > 0)
+                index += 1;
+
+            var internalNode = node as DistributedIndexInternalNode<TKey, TPointer>;
+            var childAddress = internalNode.GetChildAddress(index);
+            var childNode = Load(childAddress);
+
+            InsertRecursive(key, pointer, childNode);
         }
 
         public void Remove(TKey key)
@@ -63,7 +93,12 @@ namespace CacheIt.Index
 
         }
 
-        private void Store(DistributedIndexLeafNode<TKey, TPointer> node)
+        private DistributedIndexNode<TKey, TPointer> Load(string pointer)
+        {
+            return _cache.Get(pointer, _regionKey.Region) as DistributedIndexNode<TKey, TPointer>;
+        }
+
+        private void Store(DistributedIndexNode<TKey, TPointer> node)
         {
             _cache.Set(node.Address, node, node.Region);
         }

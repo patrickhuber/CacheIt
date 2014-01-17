@@ -48,11 +48,10 @@
   <ItemGroup>
     <Compile Include="Country.cs" />
     <Compile Include="Diagnostics\AssertTest.cs" />
-    <Compile Include="Index\BPlusInternalNodeTests.cs" />
-    <Compile Include="Index\BPlusLeafNodeTests.cs" />
     <Compile Include="Index\DistributedIndexInternalNodeTests.cs" />
     <Compile Include="Index\DistributedIndexTests.cs" />
     <Compile Include="Index\DistributedIndexLeafNodeTests.cs" />
+    <Compile Include="Index\IndexTreeTests.cs" />
     <Compile Include="IO\SegmentUtilityTests.cs" />
     <Compile Include="IO\SegmentStreamTests.cs" />
     <Compile Include="IO\BlobStreamTests.cs" />
