@@ -7,8 +7,8 @@
     <ProjectGuid>{4022F7F6-77EF-4D95-8F25-8DB896AE9881}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CacheIt.Ioc.Unity</RootNamespace>
-    <AssemblyName>CacheIt.Ioc.Unity</AssemblyName>
+    <RootNamespace>CacheIt.Unity</RootNamespace>
+    <AssemblyName>CacheIt.Unity</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>

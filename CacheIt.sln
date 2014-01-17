@@ -48,7 +48,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Memcached", "CacheI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Redis", "CacheIt.Redis\CacheIt.Redis.csproj", "{48AEF7D3-5A8D-44D9-BEF6-6A040DDBBFF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Ioc.Unity", "CacheIt.Ioc.Unity\CacheIt.Ioc.Unity.csproj", "{4022F7F6-77EF-4D95-8F25-8DB896AE9881}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Unity", "CacheIt.Ioc.Unity\CacheIt.Unity.csproj", "{4022F7F6-77EF-4D95-8F25-8DB896AE9881}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
