@@ -12,14 +12,14 @@ namespace CacheIt
     /// </summary>
     public abstract class CacheEntryChangeMonitorBase : CacheEntryChangeMonitor
     {
-        protected IList<string> cacheKeys;
+        protected ReadOnlyCollection<string> cacheKeys;
         protected DateTimeOffset lastModified;
         protected string regionName;
         protected string uniqueId;
 
-        public CacheEntryChangeMonitorBase(IEnumerable<string> keys, string regionName=null)
+        public CacheEntryChangeMonitorBase(ReadOnlyCollection<string> keys, string regionName = null)
         {
-            this.cacheKeys = new List<string>(keys);
+            this.cacheKeys = keys;
             this.regionName = regionName;
         }
 
