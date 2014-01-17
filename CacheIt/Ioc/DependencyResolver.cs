@@ -10,6 +10,8 @@ namespace CacheIt.Ioc
     /// </summary>
     public static class DependencyResolver
     {
+        private static readonly object writeLock = new object();
+
         /// <summary>
         /// The dependency resolver instance
         /// </summary>
@@ -21,7 +23,7 @@ namespace CacheIt.Ioc
         /// <param name="resolver">The resolver.</param>
         public static void SetResolver(IDependencyResolver resolver)
         {
-            lock (typeof(DependencyResolver))
+            lock (writeLock)
             {
                 dependencyResolverInstance = resolver;
             }
