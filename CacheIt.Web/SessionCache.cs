@@ -15,10 +15,24 @@ namespace CacheIt.Web
         : CacheBase
     {
         private IHttpContext httpContext;
-
-        protected virtual string GetSessionKey(string variable)
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SessionCache"/> class.
+        /// </summary>
+        public SessionCache(IHttpContext httpContext)
         {
-            return string.Format("CacheIt.Web.SessionCache.{0}.{1}", Name, variable);
+            this.httpContext = httpContext;
+            AssertPreConditions(this.httpContext);
+            var keys = new List<string>();
+        }
+        
+        /// <summary>
+        /// Asserts the pre conditions.
+        /// </summary>
+        protected virtual void AssertPreConditions(IHttpContext httpContext)
+        {
+            Assert.IsNotNull(httpContext, Strings.HttpContextIsNullExceptionMessage);
+            Assert.IsNotNull(httpContext.Session, Strings.SessionIsNullException);
         }
 
         protected T GetVariable<T>(string variableName, Func<T> resolver)
@@ -31,6 +45,11 @@ namespace CacheIt.Web
                 return default(T);
             return (T)value;
         }
+
+        protected virtual string GetSessionKey(string variable)
+        {
+            return string.Format("CacheIt.Web.SessionCache.{0}.{1}", Name, variable);
+        }        
 
         protected IDictionary<string, CacheItemPolicy> CacheItemPolicies
         {
@@ -51,30 +70,14 @@ namespace CacheIt.Web
                     () => new List<string>());
             }
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SessionCache"/> class.
-        /// </summary>
-        public SessionCache(IHttpContext httpContext)
-        {
-            this.httpContext = httpContext;
-            AssertPreConditions(this.httpContext);
-            var keys = new List<string>();
-        }
-        
-        /// <summary>
-        /// Asserts the pre conditions.
-        /// </summary>
-        protected virtual void AssertPreConditions(IHttpContext httpContext)
-        {
-            Assert.IsNotNull(httpContext, Strings.HttpContextIsNullExceptionMessage);
-            Assert.IsNotNull(httpContext.Session, Strings.SessionIsNullException);
-        }
-        
+                
         public override bool Contains(string key, string regionName = null)
         {
             AssertRegionNameIsSupported(regionName);
-            return httpContext.Session.Contains(key);
+            foreach (string sessionKey in httpContext.Session.Keys)
+                if (sessionKey == key)
+                    return true;
+            return false;
         }
 
         public override System.Runtime.Caching.CacheEntryChangeMonitor CreateCacheEntryChangeMonitor(IEnumerable<string> keys, string regionName = null)
@@ -100,12 +103,20 @@ namespace CacheIt.Web
 
         protected override IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            throw new NotImplementedException();
+            foreach (string key in httpContext.Session.Keys)
+                yield return new KeyValuePair<string, object>(key, httpContext.Session[key]);
         }
 
         public override IDictionary<string, object> GetValues(IEnumerable<string> keys, string regionName = null)
         {
-            throw new NotImplementedException();
+            var dictionary = new Dictionary<string, object>();
+            foreach(string key in keys)
+            {
+                object value = httpContext.Session[key];
+                if (value != null)
+                    dictionary.Add(key, value);
+            }
+            return dictionary;
         }
 
         public override object Remove(string key, string regionName = null)

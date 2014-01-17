@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 
@@ -11,7 +12,7 @@ namespace CacheIt.Web
     public interface IHttpSessionState
     {
         object this[string key] { get; set; }
-        bool Contains(string key);
+        NameValueCollection.KeysCollection Keys { get; }            
         int Count { get; }
         void Remove(string name);
     }

@@ -24,12 +24,9 @@ namespace CacheIt.Web
             set { sessionState[key] = value; }
         }
 
-        public bool Contains(string key)
-        {            
-            foreach (string sessionStateKey in sessionState.Keys)
-                if (key == sessionStateKey)
-                    return true;
-            return false;            
+        public System.Collections.Specialized.NameValueCollection.KeysCollection Keys 
+        {
+            get { return this.sessionState.Keys; }
         }
 
         public int Count
