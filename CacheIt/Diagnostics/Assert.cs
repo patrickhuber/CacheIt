@@ -10,6 +10,17 @@ namespace CacheIt.Diagnostics
     /// </summary>
     public class Assert
     {
+        public static void IsNull(object value, string message)
+        {
+            if (value != null)
+                throw new Exception(message);
+        }
+
+        public static void IsNull(object value)
+        {
+            IsNull(value, DiagnosticStrings.IsNullMessage);
+        }
+
         /// <summary>
         /// Asserts that the given value is not null. If the value is null throws an exception with the given message.
         /// </summary>
@@ -29,7 +40,7 @@ namespace CacheIt.Diagnostics
         /// <exception cref="System.Exception">Throws an exception if the value is null.</exception>
         public static void IsNotNull(object value)
         {
-            IsNotNull(value, Strings.IsNotNullMessage);
+            IsNotNull(value, DiagnosticStrings.IsNotNullMessage);
         }
 
         /// <summary>
@@ -53,7 +64,7 @@ namespace CacheIt.Diagnostics
         public static void IsNotNullOrWhitespace(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new Exception(Strings.IsNotNullOrWhiteSpaceMesage);
+                throw new Exception(DiagnosticStrings.IsNotNullOrWhiteSpaceMesage);
         }
 
         /// <summary>

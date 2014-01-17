@@ -116,7 +116,7 @@ namespace CacheIt
         public override object Get(string key, string regionName = null)
         {
             if ((DefaultCacheCapabilities & System.Runtime.Caching.DefaultCacheCapabilities.CacheRegions) != 0)
-                throw new NotSupportedException(strings.CacheIt_RegionName_not_supported);
+                throw new NotSupportedException(Strings.RegionNameNotSupported);
             if (key == null)
                 throw new ArgumentNullException("key");
             var cacheItem = GetCacheItem(key, regionName);
