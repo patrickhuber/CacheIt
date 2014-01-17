@@ -115,14 +115,24 @@ namespace CacheIt
         /// </returns>
         public override object Get(string key, string regionName = null)
         {
-            if ((DefaultCacheCapabilities & System.Runtime.Caching.DefaultCacheCapabilities.CacheRegions) != 0)
-                throw new NotSupportedException(Strings.RegionNameNotSupported);
+            AssertRegionNameIsSupported(regionName);
             if (key == null)
                 throw new ArgumentNullException("key");
             var cacheItem = GetCacheItem(key, regionName);
             if (cacheItem == null)
                 return null;
             return cacheItem.Value;
+        }
+
+        /// <summary>
+        /// Asserts the region name is supported.
+        /// </summary>
+        /// <param name="regionName">Name of the region.</param>
+        /// <exception cref="System.NotSupportedException"></exception>
+        protected void AssertRegionNameIsSupported(string regionName)
+        {
+            if ((DefaultCacheCapabilities & System.Runtime.Caching.DefaultCacheCapabilities.CacheRegions) != 0)
+                throw new NotSupportedException(Strings.RegionNameNotSupported);            
         }
         
         /// <summary>
