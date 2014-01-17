@@ -17,7 +17,7 @@ namespace CacheIt
         protected string regionName;
         protected string uniqueId;
 
-        public CacheEntryChangeMonitorBase(ReadOnlyCollection<string> keys, string regionName = null)
+        protected CacheEntryChangeMonitorBase(ReadOnlyCollection<string> keys, string regionName = null)
         {
             this.cacheKeys = keys;
             this.regionName = regionName;
