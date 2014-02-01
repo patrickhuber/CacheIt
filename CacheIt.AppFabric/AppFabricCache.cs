@@ -37,20 +37,7 @@ namespace CacheIt.AppFabric
         {
             cache = dataCache;
         }
-
-        /// <summary>
-        /// When overridden in a derived class, checks whether the cache entry already exists in the cache.
-        /// </summary>
-        /// <param name="key">A unique identifier for the cache entry.</param>
-        /// <param name="regionName">Optional. A named region in the cache where the cache can be found, if regions are implemented. The default value for the optional parameter is null.</param>
-        /// <returns>
-        /// true if the cache contains a cache entry with the same key value as <paramref name="key" />; otherwise, false.
-        /// </returns>
-        public override bool Contains(string key, string regionName = null)
-        {
-            return cache.Get(key, regionName) != null;
-        }
-
+        
         /// <summary>
         /// When overridden in a derived class, creates a <see cref="T:System.Runtime.Caching.CacheEntryChangeMonitor" /> object that can trigger events in response to changes to specified cache entries.
         /// </summary>

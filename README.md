@@ -9,6 +9,12 @@ CacheIt is based on the System.Runtime.Caching abstract classes. It implements s
 ### AppFabric 1.1 [(link)](CacheIt.AppFabric/CacheIt.AppFabric.md)
 * AppFabricCache
 
+### Redis [(link)](CacheIt.Reddis/CacheIt.Redis.md)
+* RedisCache
+
+### Memcached [(link)](CacheIt.Reddis/CacheIt.Memcached.md)
+* RedisCache
+
 ## Examples of using the framework
 ### Lucene.NET library [(link)](CacheIt.Lucene/CacheIt.Lucene.md) for documentation 
 * Creates a Directory provider based off of CacheIt chunk streams

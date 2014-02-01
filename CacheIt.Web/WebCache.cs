@@ -11,17 +11,11 @@ namespace CacheIt.Web
     {
         private Cache cache;
 
-        public WebCache(string name) : base()
+        public WebCache(Cache cache) : base()
         {
-            cache = new Cache();
-            
+            this.cache = cache;
         }
-
-        public override bool Contains(string key, string regionName = null)
-        {
-            return cache.Get(key) != null;
-        }
-
+        
         public override CacheEntryChangeMonitor CreateCacheEntryChangeMonitor(IEnumerable<string> keys, string regionName = null)
         {
             

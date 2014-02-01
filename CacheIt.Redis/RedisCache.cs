@@ -15,12 +15,7 @@ namespace CacheIt.Redis
         {
             redisClient = cache;
         }
-
-        public override bool Contains(string key, string regionName = null)
-        {
-            return redisClient.Get<object>(key) != null;
-        }
-
+        
         public override CacheEntryChangeMonitor CreateCacheEntryChangeMonitor(IEnumerable<string> keys, string regionName = null)
         {
             if (!SupportsCapability(DefaultCacheCapabilities.CacheEntryChangeMonitors))
