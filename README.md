@@ -12,8 +12,11 @@ CacheIt is based on the System.Runtime.Caching abstract classes. It implements s
 ### Redis [(link)](CacheIt.Reddis/CacheIt.Redis.md)
 * RedisCache
 
-### Memcached [(link)](CacheIt.Reddis/CacheIt.Memcached.md)
-* RedisCache
+### Memcached [(link)](CacheIt.Memcached/CacheIt.Memcached.md)
+* MemcachedCache
+
+### NCache [(link)](CacheIt.NCache/CacheIt.NCache.md)
+* NCacheCache
 
 ## Examples of using the framework
 ### Lucene.NET library [(link)](CacheIt.Lucene/CacheIt.Lucene.md) for documentation 
