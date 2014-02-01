@@ -46,7 +46,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Unity", "CacheIt.Io
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Tests.Unit", "Tests\CacheIt.Tests.Unit\CacheIt.Tests.Unit.csproj", "{8FE6F17E-EC43-4ACB-A740-C13FD96394A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Tests.Integration", "Tests\CacheIt.Tests.Integration\CacheIt.Tests.Integration.csproj", "{7583EB33-1A09-48F2-8DC4-6D6DA4E41A93}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.AppFabric.Tests.Integration", "Tests\CacheIt.Tests.Integration\CacheIt.AppFabric.Tests.Integration.csproj", "{7583EB33-1A09-48F2-8DC4-6D6DA4E41A93}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheIt.Lucene.Tests.Unit", "Tests\CacheIt.Lucene.Tests.Unit\CacheIt.Lucene.Tests.Unit.csproj", "{E1E944E4-3BA8-4A7C-8716-D6A715557E37}"
 EndProject

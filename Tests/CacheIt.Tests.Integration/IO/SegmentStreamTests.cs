@@ -1,55 +1,29 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.ApplicationServer.Caching;
-using CacheIt.AppFabric;
-using CacheIt.IO;
 using System.IO;
+using CacheIt.IO;
 
-namespace CacheIt.Tests.Integration
+namespace CacheIt.AppFabric.Tests.Integration.IO
 {
     [TestClass]
-    public class AppFabricTests
+    public class SegmentStreamTests : AppFabricUnitTestBase
     {
-        // create the object cache instance from the object cache        
-        DataCache cache;
-
         [TestInitialize]
         public void AppFabricTests_Initialize()
         {
-            cache = new DataCacheFactory().GetDefaultCache();
+            Initialize();
         }
 
-        [Serializable]
-        private class TestClass
+        [TestMethod]
+        public void Test_SegmentStream_Stream_Write_To_AppFabric()
         {
-            public string Name { get; set; }
-        }
-
-        [TestMethod]
-        public void Test_Same_Object_In_Cache()
-        {            
-            var testInstance = new TestClass();
-            testInstance.Name = "my instance";
-            cache.Put("testInstance", testInstance);
-            testInstance.Name = "not my instance";
-            testInstance = cache.Get("testInstance") as TestClass;
-            Assert.AreEqual("my instance", testInstance.Name);
-            cache.Remove("testInstance");
-        }
-
-        [TestMethod]
-        public void Test_Stream_Write_To_AppFabric()
-        {            
             const string Key = "hello-world.txt";
 
             string testFile = Key;
             string expectedFileContents =
                 @"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
-            
-            AppFabricCache appFabricCache = new AppFabricCache(cache);
+
+            AppFabricCache appFabricCache = new AppFabricCache(Cache);
 
             // create a chunk stream and write the file contents using the chunk stream
             SegmentStream segmentStream = new SegmentStream(appFabricCache, testFile);
