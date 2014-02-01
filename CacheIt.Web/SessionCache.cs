@@ -93,7 +93,9 @@ namespace CacheIt.Web
         
         public override System.Runtime.Caching.CacheItem GetCacheItem(string key, string regionName = null)
         {
-            throw new NotImplementedException();
+            AssertRegionNameIsSupported(regionName);
+            var item = this.httpContext.Session[key];
+            return item as CacheItem;            
         }
 
         public override long GetCount(string regionName = null)
@@ -104,19 +106,30 @@ namespace CacheIt.Web
         protected override IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
             foreach (string key in httpContext.Session.Keys)
-                yield return new KeyValuePair<string, object>(key, httpContext.Session[key]);
+            {
+                var value = GetInternal(key);
+                yield return new KeyValuePair<string, object>(key, value);
+            }
         }
-
+        
         public override IDictionary<string, object> GetValues(IEnumerable<string> keys, string regionName = null)
         {
             var dictionary = new Dictionary<string, object>();
             foreach(string key in keys)
             {
-                object value = httpContext.Session[key];
+                var value = GetInternal(key);
                 if (value != null)
                     dictionary.Add(key, value);
             }
             return dictionary;
+        }
+        
+        protected object GetInternal(string key)
+        {
+            var item = httpContext.Session[key];
+            var cacheItem = item as CacheItem;
+            var value = cacheItem == null ? item : cacheItem.Value;
+            return value;
         }
 
         public override object Remove(string key, string regionName = null)

@@ -54,6 +54,7 @@
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
     <Compile Include="WebCache.cs" />
+    <Compile Include="WebCacheChangeMonitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CacheIt\CacheIt.csproj">

@@ -81,7 +81,7 @@ namespace CacheIt.Web
         }
 
         public override void Set(CacheItem item, CacheItemPolicy policy)
-        {
+        {            
             this.cache.Add(
                 item.Key,
                 item,
@@ -89,11 +89,10 @@ namespace CacheIt.Web
                 policy.AbsoluteExpiration.DateTime,
                 policy.SlidingExpiration,
                 Map(policy.Priority),
-                (s, o, c) => 
-                {
-                    
-                });
+                OnCacheItemRemoved);
         }
+
+        public event CacheItemRemovedCallback OnCacheItemRemoved = null;
 
         public System.Web.Caching.CacheItemPriority Map(System.Runtime.Caching.CacheItemPriority priority)
         {
