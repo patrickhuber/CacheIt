@@ -18,7 +18,7 @@ using Lucene.Net.Documents;
 using Lucene.Net.Search;
 using Lucene.Net.QueryParsers;
 
-namespace CacheIt.Lucene.UnitTests
+namespace CacheIt.Lucene.Tests.Unit
 {
     [TestClass]
     public class CacheDirectoryTests

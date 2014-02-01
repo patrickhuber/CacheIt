@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using CacheIt.IO;
 
-namespace CacheIt.UnitTests.IO
+namespace CacheIt.Tests.Unit.IO
 {
     [TestClass]
     public class BlobStreamTests

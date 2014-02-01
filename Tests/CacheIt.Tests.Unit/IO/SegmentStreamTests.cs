@@ -8,7 +8,7 @@ using CacheIt.IO;
 using CacheIt;
 using System.IO;
 
-namespace CacheIt.UnitTests.IO
+namespace CacheIt.Tests.Unit.IO
 {
     /// <summary>
     /// Summary description for BufferedStreamTests

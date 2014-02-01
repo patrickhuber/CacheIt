@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-namespace CacheIt.UnitTests
+namespace CacheIt.Tests.Unit
 {
     public class Country
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CacheIt.IO;
 
-namespace CacheIt.UnitTests.IO
+namespace CacheIt.Tests.Unit.IO
 {
     /// <summary>
     /// Summary description for SegmentServiceTests

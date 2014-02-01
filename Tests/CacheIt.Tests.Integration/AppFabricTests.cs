@@ -8,7 +8,7 @@ using CacheIt.AppFabric;
 using CacheIt.IO;
 using System.IO;
 
-namespace CacheIt.IntegrationTests
+namespace CacheIt.Tests.Integration
 {
     [TestClass]
     public class AppFabricTests

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CacheIt.UnitTests")]
+[assembly: AssemblyTitle("CacheIt.Lucene.Tests.Unit")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CacheIt.UnitTests")]
+[assembly: AssemblyProduct("CacheIt.Lucene.Tests.Unit")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("88ca2f65-d340-4d6f-8bb1-3cbfe0aa627a")]
+[assembly: Guid("d357320e-5a33-4981-b4e3-7a2a6574b194")]
 
 // Version information for an assembly consists of the following four values:
 //

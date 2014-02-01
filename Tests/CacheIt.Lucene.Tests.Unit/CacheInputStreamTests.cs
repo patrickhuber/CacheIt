@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 
-namespace CacheIt.Lucene.UnitTests
+namespace CacheIt.Lucene.Tests.Unit
 {
     [TestClass]
     public class CacheInputStreamTests

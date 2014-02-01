@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Lucene.Net.Store;
 
-namespace CacheIt.Lucene.UnitTests
+namespace CacheIt.Lucene.Tests.Unit
 {
     [TestClass]
     public class SearchTests

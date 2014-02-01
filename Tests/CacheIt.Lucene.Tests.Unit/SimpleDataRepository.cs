@@ -7,7 +7,7 @@ using Lucene.Net.Documents;
 using System;
 using Lucene.Net.Search;
 
-namespace CacheIt.Lucene.UnitTests
+namespace CacheIt.Lucene.Tests.Unit
 {
     
     /// <summary>

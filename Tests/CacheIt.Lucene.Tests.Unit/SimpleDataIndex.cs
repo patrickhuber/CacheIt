@@ -11,7 +11,7 @@ using Lucene.Net.Store;
 using Version = Lucene.Net.Util.Version;
 using Lucene.Net.Analysis;
 
-namespace CacheIt.Lucene.UnitTests
+namespace CacheIt.Lucene.Tests.Unit
 {
     public class SimpleDataIndex
     {        
