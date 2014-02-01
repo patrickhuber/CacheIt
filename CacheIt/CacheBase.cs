@@ -185,5 +185,10 @@ namespace CacheIt
                 Set(key, value, InfiniteAbsoluteExpiration);
             }
         }
+
+        protected bool SupportsCapability(DefaultCacheCapabilities capability)
+        {
+            return (this.DefaultCacheCapabilities & capability) != 0;
+        }
     }
 }

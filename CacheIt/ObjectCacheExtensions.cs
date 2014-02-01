@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Runtime.Caching;
+using System.Text;
 
 namespace CacheIt
 {
@@ -47,6 +48,26 @@ namespace CacheIt
         public static void Set(this ObjectCache objectCache, string key, object value, string region=null)
         {
             objectCache.Set(key, value, ObjectCache.InfiniteAbsoluteExpiration, region);
+        }
+
+        /// <summary>
+        /// Clears the specified object cache.
+        /// </summary>
+        /// <param name="objectCache">The object cache.</param>
+        /// <param name="region">The region.</param>
+        public static void Clear(this ObjectCache objectCache, string region = null)
+        {
+            int count = 0;
+            KeyValuePair<string, object> toRemove = default(KeyValuePair<string, object>);
+            foreach (var keyValuePair in objectCache)
+            {
+                if (count > 0)
+                    objectCache.Remove(keyValuePair.Key, region);
+                toRemove = keyValuePair;
+                count++;
+            }
+            if(count > 0)
+                objectCache.Remove(toRemove.Key, region);
         }
     }
 }
