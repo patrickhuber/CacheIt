@@ -46,6 +46,7 @@
     <Compile Include="HttpSessionStateAdapter.cs" />
     <Compile Include="IHttpContext.cs" />
     <Compile Include="IHttpSessionState.cs" />
+    <Compile Include="ObjectCacheSessionStateStoreProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SessionCache.cs" />
     <Compile Include="Strings.Designer.cs">
