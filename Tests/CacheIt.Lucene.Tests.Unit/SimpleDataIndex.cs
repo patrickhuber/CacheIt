@@ -117,37 +117,5 @@ namespace CacheIt.Lucene.Tests.Unit
             }
             return query;
         } 
-
-        //private void AddUpdateLuceneIndex(IEnumerable<SimpleData> simpleDataList)
-        //{
-        //    using (var analyzer = new StandardAnalyzer(Version.LUCENE_30))
-        //    {
-        //        using (var writer = new IndexWriter(directory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
-        //        {
-        //            foreach (var simpleData in simpleDataList)
-        //            {
-        //                AddToLuceneIndex(simpleData, writer);
-        //            }
-        //        }
-        //    }
-        //}
-
-        //private void AddToLuceneIndex(SimpleData simpleData, IndexWriter writer)
-        //{
-        //    // remove older index entries
-        //    var searchQuery = new TermQuery(new Term("Id", simpleData.Id.ToString()));
-        //    writer.DeleteDocuments(searchQuery);
-
-        //    // add new index entry
-        //    var doc = new Document();
-
-        //    // add lucene fields mapped to our object
-        //    doc.Add(new Field("Id", simpleData.Id.ToString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        //    doc.Add(new Field("Name", simpleData.Name, Field.Store.YES, Field.Index.ANALYZED));
-        //    doc.Add(new Field("Description", simpleData.Description, Field.Store.YES, Field.Index.ANALYZED));
-
-        //    // add entry to the index
-        //    writer.AddDocument(doc);
-        //}
     }
 }
