@@ -32,6 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Xml.Linq" />
@@ -49,6 +50,7 @@
     <Compile Include="Configuration\IGlobalConfiguration.cs" />
     <Compile Include="Diagnostics\Assert.cs" />
     <Compile Include="IObjectCache.cs" />
+    <Compile Include="Ioc\CompositionDependencyResolver.cs" />
     <Compile Include="Ioc\DependencyResolver.cs">
       <SubType>Code</SubType>
     </Compile>
