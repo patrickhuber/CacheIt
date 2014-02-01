@@ -71,23 +71,7 @@ namespace CacheIt
             Add(key, value, policy, regionName);
             return value;
         }
-
-        /// <summary>
-        /// When overridden in a derived class, inserts the specified <see cref="T:System.Runtime.Caching.CacheItem" /> object into the cache, specifying information about how the entry will be evicted.
-        /// </summary>
-        /// <param name="value">The object to insert.</param>
-        /// <param name="policy">An object that contains eviction details for the cache entry. This object provides more options for eviction than a simple absolute expiration.</param>
-        /// <returns>
-        /// If a cache entry with the same key exists, the specified cache entry; otherwise, null.
-        /// </returns>
-        public override CacheItem AddOrGetExisting(System.Runtime.Caching.CacheItem value, CacheItemPolicy policy)
-        {
-            if (Contains(value.Key, value.RegionName))
-                return GetCacheItem(value.Key, value.RegionName);
-            Add(value, policy);
-            return value;
-        }
-
+        
         /// <summary>
         /// When overridden in a derived class, inserts a cache entry into the cache, by using a key, an object for the cache entry, an absolute expiration value, and an optional region to add the cache into.
         /// </summary>
@@ -122,6 +106,28 @@ namespace CacheIt
             if (cacheItem == null)
                 return null;
             return cacheItem.Value;
+        }
+
+        /// <summary>
+        /// Gets a set of cache entries that correspond to the specified keys.
+        /// </summary>
+        /// <param name="keys">A collection of unique identifiers for the cache entries to get.</param>
+        /// <param name="regionName">Optional. A named region in the cache to which the cache entry or entries were added, if regions are implemented. The default value for the optional parameter is null.</param>
+        /// <returns>
+        /// A dictionary of key/value pairs that represent cache entries.
+        /// </returns>
+        public override IDictionary<string, object> GetValues(IEnumerable<string> keys, string regionName = null)
+        {
+            var dictionary = new Dictionary<string, object>();
+            foreach (var key in keys)
+            {
+                var result = this.GetCacheItem(key);
+                if (result != null)
+                {
+                    dictionary.Add(key, result.Value);
+                }
+            }
+            return dictionary;
         }
 
         /// <summary>

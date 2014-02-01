@@ -200,5 +200,10 @@ namespace CacheIt.AppFabric
                     cache.Put(item.Key, item, item.RegionName);   
             }            
         }
+
+        public override CacheItem AddOrGetExisting(CacheItem value, CacheItemPolicy policy)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

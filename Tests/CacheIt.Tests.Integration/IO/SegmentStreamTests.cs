@@ -6,7 +6,7 @@ using CacheIt.IO;
 namespace CacheIt.AppFabric.Tests.Integration.IO
 {
     [TestClass]
-    public class SegmentStreamTests : AppFabricUnitTestBase
+    public class SegmentStreamTests : AppFabricIntegrationTestBase
     {
         [TestInitialize]
         public void AppFabricTests_Initialize()

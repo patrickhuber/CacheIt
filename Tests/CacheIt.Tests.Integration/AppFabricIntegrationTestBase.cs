@@ -7,11 +7,11 @@ using System.Collections.ObjectModel;
 
 namespace CacheIt.AppFabric.Tests.Integration
 {
-    public abstract class AppFabricUnitTestBase
+    public abstract class AppFabricIntegrationTestBase
     {
         public DataCache Cache{get; private set;}
         
-        static AppFabricUnitTestBase()
+        static AppFabricIntegrationTestBase()
         { 
             
         }

@@ -59,21 +59,7 @@ namespace CacheIt.Web
                 yield return new KeyValuePair<string, object>(cacheItem.Key, cacheItem.Value);
             }
         }
-
-        public override IDictionary<string, object> GetValues(IEnumerable<string> keys, string regionName = null)
-        {
-            var dictionary = new Dictionary<string, object>();
-            foreach (var key in keys)
-            {
-                var result = this.GetCacheItem(key);
-                if (result != null)
-                {
-                    dictionary.Add(key, result.Value);
-                }
-            }
-            return dictionary;
-        }
-
+        
         public override object Remove(string key, string regionName = null)
         {
             var cacheItem = this.cache.Remove(key) as CacheItem;
@@ -81,15 +67,8 @@ namespace CacheIt.Web
         }
 
         public override void Set(CacheItem item, CacheItemPolicy policy)
-        {            
-            this.cache.Add(
-                item.Key,
-                item,
-                null,
-                policy.AbsoluteExpiration.DateTime,
-                policy.SlidingExpiration,
-                Map(policy.Priority),
-                OnCacheItemRemoved);
+        {
+            Insert(item, policy);
         }
 
         public event CacheItemRemovedCallback OnCacheItemRemoved = null;
@@ -106,6 +85,27 @@ namespace CacheIt.Web
                 default:
                     return System.Web.Caching.CacheItemPriority.Default;
             }
+        }
+
+        public override CacheItem AddOrGetExisting(CacheItem item, CacheItemPolicy policy)
+        {
+            var instance = GetCacheItem(item.Key);
+            if (instance != null)
+                return instance;
+            return Insert(item, policy);
+        }
+
+        private CacheItem Insert(CacheItem cacheItem, CacheItemPolicy policy)
+        {
+            this.cache.Insert(
+                cacheItem.Key,
+                cacheItem,
+                null,
+                policy.AbsoluteExpiration.DateTime,
+                policy.SlidingExpiration,
+                Map(policy.Priority),
+                OnCacheItemRemoved);
+            return cacheItem;
         }
     }
 }

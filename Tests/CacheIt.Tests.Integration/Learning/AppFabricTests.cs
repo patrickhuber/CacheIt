@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace CacheIt.AppFabric.Tests.Integration.Learning
 {
     [TestClass]
-    public class AppFabricTests : AppFabricUnitTestBase
+    public class AppFabricTests : AppFabricIntegrationTestBase
     {
         [TestInitialize]
         public void AppFabricTests_Initialize()
@@ -50,6 +50,7 @@ namespace CacheIt.AppFabric.Tests.Integration.Learning
             }
             stopWatch.Stop();
             Assert.IsTrue(1000 > stopWatch.ElapsedMilliseconds);
+            Debug.WriteLine("througput = {0} items/sec", 1000D / 1000D / Convert.ToDouble(stopWatch.ElapsedMilliseconds));
             for (int i = 0; i < 10000; i++)
             {
                 string key = CreateKey(i);

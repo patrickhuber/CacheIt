@@ -72,5 +72,14 @@ namespace CacheIt.Redis
         {
             redisClient.Set<CacheItem>(item.Key, item, policy.AbsoluteExpiration.DateTime);
         }
+
+        public override CacheItem AddOrGetExisting(CacheItem item, CacheItemPolicy policy)
+        {
+            var instance = GetCacheItem(item.Key);
+            if (instance != null)
+                return instance;
+            Set(item, policy);
+            return item;
+        }
     }
 }

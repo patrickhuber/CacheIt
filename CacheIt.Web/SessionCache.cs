@@ -11,8 +11,7 @@ namespace CacheIt.Web
     /// <summary>
     /// Implements a session cache
     /// </summary>
-    public class SessionCache
-        : CacheBase
+    public class SessionCache : CacheBase
     {
         private IHttpContext httpContext;
         
@@ -111,19 +110,7 @@ namespace CacheIt.Web
                 yield return new KeyValuePair<string, object>(key, value);
             }
         }
-        
-        public override IDictionary<string, object> GetValues(IEnumerable<string> keys, string regionName = null)
-        {
-            var dictionary = new Dictionary<string, object>();
-            foreach(string key in keys)
-            {
-                var value = GetInternal(key);
-                if (value != null)
-                    dictionary.Add(key, value);
-            }
-            return dictionary;
-        }
-        
+                
         protected object GetInternal(string key)
         {
             var item = httpContext.Session[key];
@@ -143,6 +130,11 @@ namespace CacheIt.Web
         public override void Set(System.Runtime.Caching.CacheItem item, System.Runtime.Caching.CacheItemPolicy policy)
         {
             httpContext.Session[item.Key] = item;
+        }
+
+        public override CacheItem AddOrGetExisting(CacheItem value, CacheItemPolicy policy)
+        {
+            throw new NotImplementedException();
         }
     }
 }
