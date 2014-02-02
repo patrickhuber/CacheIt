@@ -27,7 +27,7 @@ namespace CacheIt.AppFabric.Tests.Integration.Learning
         }
 
         [TestMethod]
-        public void Test_Same_Object_In_Cache()
+        public void Test_AppFabric_Same_Object_In_Cache()
         {            
             var testInstance = new TestClass();
             testInstance.Name = "my instance";
