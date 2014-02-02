@@ -16,7 +16,7 @@ namespace CacheIt.AppFabric
         /// <summary>
         /// The cache
         /// </summary>
-        private DataCache cache;
+        private IDataCache cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AppFabricCache"/> class.
@@ -33,7 +33,7 @@ namespace CacheIt.AppFabric
         /// Initializes a new instance of the <see cref="AppFabricCache"/> class.
         /// </summary>
         /// <param name="dataCache">The data cache.</param>
-        public AppFabricCache(DataCache dataCache)
+        public AppFabricCache(IDataCache dataCache)
         {
             cache = dataCache;
         }
