@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.ApplicationServer.Caching;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,385 +8,405 @@ namespace CacheIt.AppFabric
 {
     public class DataCacheAdapter : IDataCache
     {
+        private DataCache dataCache;
+        public DataCacheAdapter(DataCache dataCache)
+        {
+            this.dataCache = dataCache;
+        }
+
         public object this[string key]
         {
-            get
+            get { return this.dataCache[key]; }
+            set { this.dataCache[key] = value; }
+        }
+
+        public event EventHandler<CacheOperationStartedEventArgs> CacheOperationStarted
+        {
+            add 
             {
-                throw new NotImplementedException();
+                this.dataCache.CacheOperationStarted += value;
             }
-            set
+            remove 
             {
-                throw new NotImplementedException();
+                this.dataCache.CacheOperationStarted -= value;
             }
         }
 
-        public event EventHandler<Microsoft.ApplicationServer.Caching.CacheOperationStartedEventArgs> CacheOperationStarted;
-
-        public event EventHandler<Microsoft.ApplicationServer.Caching.CacheOperationCompletedEventArgs> CacheOperationCompleted;
-
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Add(string key, object value)
+        public event EventHandler<CacheOperationCompletedEventArgs> CacheOperationCompleted
         {
-            throw new NotImplementedException();
+            add 
+            {
+                this.dataCache.CacheOperationCompleted += value;
+            }
+            remove 
+            {
+                this.dataCache.CacheOperationCompleted -= value;
+            }
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Add(string key, object value, string region)
+        public DataCacheItemVersion Add(string key, object value)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Add(key, value);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Add(string key, object value, TimeSpan timeout)
+        public DataCacheItemVersion Add(string key, object value, string region)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Add(key, value, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Add(string key, object value, TimeSpan timeout, string region)
+        public DataCacheItemVersion Add(string key, object value, TimeSpan timeout)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Add(key, value, timeout);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Add(string key, object value, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags)
+        public DataCacheItemVersion Add(string key, object value, TimeSpan timeout, string region)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Add(key, value, timeout, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Add(string key, object value, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags, string region)
+        public DataCacheItemVersion Add(string key, object value, IEnumerable<DataCacheTag> tags)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Add(key, value, tags);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Add(string key, object value, TimeSpan timeout, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags)
+        public DataCacheItemVersion Add(string key, object value, IEnumerable<DataCacheTag> tags, string region)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Add(key, value, tags, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Add(string key, object value, TimeSpan timeout, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags, string region)
+        public DataCacheItemVersion Add(string key, object value, TimeSpan timeout, IEnumerable<DataCacheTag> tags)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Add(key, value, timeout, tags);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value)
+        public DataCacheItemVersion Add(string key, object value, TimeSpan timeout, IEnumerable<DataCacheTag> tags, string region)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Add(key, value, timeout, tags, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, string region)
+        public DataCacheItemVersion Put(string key, object value)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheItemVersion oldVersion)
+        public DataCacheItemVersion Put(string key, object value, string region)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheItemVersion oldVersion, string region)
+        public DataCacheItemVersion Put(string key, object value, DataCacheItemVersion oldVersion)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, oldVersion);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, TimeSpan timeout)
+        public DataCacheItemVersion Put(string key, object value, DataCacheItemVersion oldVersion, string region)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, oldVersion, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, TimeSpan timeout, string region)
+        public DataCacheItemVersion Put(string key, object value, TimeSpan timeout)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, timeout);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags)
+        public DataCacheItemVersion Put(string key, object value, TimeSpan timeout, string region)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, timeout, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags, string region)
+        public DataCacheItemVersion Put(string key, object value, IEnumerable<DataCacheTag> tags)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, tags);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheItemVersion oldVersion, TimeSpan timeout)
+        public DataCacheItemVersion Put(string key, object value, IEnumerable<DataCacheTag> tags, string region)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheItemVersion oldVersion, TimeSpan timeout, string region)
+        public DataCacheItemVersion Put(string key, object value, DataCacheItemVersion oldVersion, TimeSpan timeout)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, oldVersion, timeout);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheItemVersion oldVersion, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags)
+        public DataCacheItemVersion Put(string key, object value, DataCacheItemVersion oldVersion, TimeSpan timeout, string region)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, oldVersion, timeout, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheItemVersion oldVersion, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags, string region)
+        public DataCacheItemVersion Put(string key, object value, DataCacheItemVersion oldVersion, IEnumerable<DataCacheTag> tags)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, oldVersion, tags);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, TimeSpan timeout, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags)
+        public DataCacheItemVersion Put(string key, object value, DataCacheItemVersion oldVersion, IEnumerable<DataCacheTag> tags, string region)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, oldVersion, tags, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, TimeSpan timeout, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags, string region)
+        public DataCacheItemVersion Put(string key, object value, TimeSpan timeout, IEnumerable<DataCacheTag> tags)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, timeout, tags);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheItemVersion oldVersion, TimeSpan timeout, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags)
+        public DataCacheItemVersion Put(string key, object value, TimeSpan timeout, IEnumerable<DataCacheTag> tags, string region)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, timeout, tags, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion Put(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheItemVersion oldVersion, TimeSpan timeout, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags, string region)
+        public DataCacheItemVersion Put(string key, object value, DataCacheItemVersion oldVersion, TimeSpan timeout, IEnumerable<DataCacheTag> tags)
         {
-            throw new NotImplementedException();
+            return this.dataCache.Put(key, value, oldVersion, timeout, tags);
+        }
+
+        public DataCacheItemVersion Put(string key, object value, DataCacheItemVersion oldVersion, TimeSpan timeout, IEnumerable<DataCacheTag> tags, string region)
+        {
+            return this.dataCache.Put(key, value, oldVersion, timeout, tags, region);
         }
 
         public object Get(string key)
         {
-            throw new NotImplementedException();
+            return dataCache.Get(key);
         }
 
-        public object Get(string key, out Microsoft.ApplicationServer.Caching.DataCacheItemVersion version)
+        public object Get(string key, out DataCacheItemVersion version)
         {
-            throw new NotImplementedException();
+            return dataCache.Get(key, out version);
         }
 
         public object Get(string key, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.Get(key, region);
         }
 
-        public object Get(string key, out Microsoft.ApplicationServer.Caching.DataCacheItemVersion version, string region)
+        public object Get(string key, out DataCacheItemVersion version, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.Get(key, out version, region);
         }
 
         public IEnumerable<KeyValuePair<string, object>> BulkGet(IEnumerable<string> keys, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.BulkGet(keys, region);
         }
 
         public bool Remove(string key)
         {
-            throw new NotImplementedException();
+            return dataCache.Remove(key);
         }
 
         public bool Remove(string key, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.Remove(key, region);
         }
 
-        public bool Remove(string key, Microsoft.ApplicationServer.Caching.DataCacheItemVersion version)
+        public bool Remove(string key, DataCacheItemVersion version)
         {
-            throw new NotImplementedException();
+            return dataCache.Remove(key, version);
         }
 
-        public bool Remove(string key, Microsoft.ApplicationServer.Caching.DataCacheItemVersion version, string region)
+        public bool Remove(string key, DataCacheItemVersion version, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.Remove(key, version, region);
         }
 
         public void ResetObjectTimeout(string key, TimeSpan newTimeout)
         {
-            throw new NotImplementedException();
+            dataCache.ResetObjectTimeout(key, newTimeout);
         }
 
         public void ResetObjectTimeout(string key, TimeSpan newTimeout, string region)
         {
-            throw new NotImplementedException();
+            dataCache.ResetObjectTimeout(key, newTimeout, region);
         }
 
-        public object GetIfNewer(string key, ref Microsoft.ApplicationServer.Caching.DataCacheItemVersion version)
+        public object GetIfNewer(string key, ref DataCacheItemVersion version)
         {
-            throw new NotImplementedException();
+            return dataCache.GetIfNewer(key, ref version);
         }
 
-        public object GetIfNewer(string key, ref Microsoft.ApplicationServer.Caching.DataCacheItemVersion version, string region)
+        public object GetIfNewer(string key, ref DataCacheItemVersion version, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.GetIfNewer(key, ref version, region);
         }
 
-        public object GetAndLock(string key, TimeSpan timeout, out Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle)
+        public object GetAndLock(string key, TimeSpan timeout, out DataCacheLockHandle lockHandle)
         {
-            throw new NotImplementedException();
+            return dataCache.GetAndLock(key, timeout, out lockHandle);
         }
 
-        public object GetAndLock(string key, TimeSpan timeout, out Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, bool forceLock)
+        public object GetAndLock(string key, TimeSpan timeout, out DataCacheLockHandle lockHandle, bool forceLock)
         {
-            throw new NotImplementedException();
+            return dataCache.GetAndLock(key, timeout, out lockHandle, forceLock);
         }
 
-        public object GetAndLock(string key, TimeSpan timeout, out Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, string region, bool forceLock)
+        public object GetAndLock(string key, TimeSpan timeout, out DataCacheLockHandle lockHandle, string region, bool forceLock)
         {
-            throw new NotImplementedException();
+            return dataCache.GetAndLock(key, timeout, out lockHandle, region, forceLock);
         }
 
-        public object GetAndLock(string key, TimeSpan timeout, out Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, string region)
+        public object GetAndLock(string key, TimeSpan timeout, out DataCacheLockHandle lockHandle, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.GetAndLock(key, timeout, out lockHandle, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion PutAndUnlock(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle)
+        public DataCacheItemVersion PutAndUnlock(string key, object value, DataCacheLockHandle lockHandle)
         {
-            throw new NotImplementedException();
+            return dataCache.PutAndUnlock(key, value, lockHandle);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion PutAndUnlock(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, string region)
+        public DataCacheItemVersion PutAndUnlock(string key, object value, DataCacheLockHandle lockHandle, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.PutAndUnlock(key, value, lockHandle, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion PutAndUnlock(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, TimeSpan timeout)
+        public DataCacheItemVersion PutAndUnlock(string key, object value, DataCacheLockHandle lockHandle, TimeSpan timeout)
         {
-            throw new NotImplementedException();
+            return dataCache.PutAndUnlock(key, value, lockHandle, timeout);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion PutAndUnlock(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, TimeSpan timeout, string region)
+        public DataCacheItemVersion PutAndUnlock(string key, object value, DataCacheLockHandle lockHandle, TimeSpan timeout, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.PutAndUnlock(key, value, lockHandle, timeout, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion PutAndUnlock(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags)
+        public DataCacheItemVersion PutAndUnlock(string key, object value, DataCacheLockHandle lockHandle, IEnumerable<DataCacheTag> tags)
         {
-            throw new NotImplementedException();
+            return dataCache.PutAndUnlock(key, value, lockHandle, tags);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion PutAndUnlock(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags, string region)
+        public DataCacheItemVersion PutAndUnlock(string key, object value, DataCacheLockHandle lockHandle, IEnumerable<DataCacheTag> tags, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.PutAndUnlock(key, value, lockHandle, tags, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion PutAndUnlock(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, TimeSpan timeout, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags)
+        public DataCacheItemVersion PutAndUnlock(string key, object value, DataCacheLockHandle lockHandle, TimeSpan timeout, IEnumerable<DataCacheTag> tags)
         {
-            throw new NotImplementedException();
+            return dataCache.PutAndUnlock(key, value, lockHandle, timeout, tags);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItemVersion PutAndUnlock(string key, object value, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, TimeSpan timeout, IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags, string region)
+        public DataCacheItemVersion PutAndUnlock(string key, object value, DataCacheLockHandle lockHandle, TimeSpan timeout, IEnumerable<DataCacheTag> tags, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.PutAndUnlock(key, value, lockHandle, timeout, tags, region);
         }
 
-        public void Unlock(string key, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle)
+        public void Unlock(string key, DataCacheLockHandle lockHandle)
         {
-            throw new NotImplementedException();
+            dataCache.Unlock(key, lockHandle);
         }
 
-        public void Unlock(string key, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, TimeSpan timeout)
+        public void Unlock(string key, DataCacheLockHandle lockHandle, TimeSpan timeout)
         {
-            throw new NotImplementedException();
+            dataCache.Unlock(key, lockHandle, timeout);
         }
 
-        public void Unlock(string key, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, string region)
+        public void Unlock(string key, DataCacheLockHandle lockHandle, string region)
         {
-            throw new NotImplementedException();
+            dataCache.Unlock(key, lockHandle, region);
         }
 
-        public void Unlock(string key, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, TimeSpan timeout, string region)
+        public void Unlock(string key, DataCacheLockHandle lockHandle, TimeSpan timeout, string region)
         {
-            throw new NotImplementedException();
+            dataCache.Unlock(key, lockHandle, timeout, region);
         }
 
-        public bool Remove(string key, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle)
+        public bool Remove(string key, DataCacheLockHandle lockHandle)
         {
-            throw new NotImplementedException();
+            return dataCache.Remove(key, lockHandle);
         }
 
-        public bool Remove(string key, Microsoft.ApplicationServer.Caching.DataCacheLockHandle lockHandle, string region)
+        public bool Remove(string key, DataCacheLockHandle lockHandle, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.Remove(key, lockHandle, region);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItem GetCacheItem(string key)
+        public DataCacheItem GetCacheItem(string key)
         {
-            throw new NotImplementedException();
+            return dataCache.GetCacheItem(key);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheItem GetCacheItem(string key, string region)
+        public DataCacheItem GetCacheItem(string key, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.GetCacheItem(key, region);
         }
 
         public bool CreateRegion(string region)
         {
-            throw new NotImplementedException();
+            return dataCache.CreateRegion(region);
         }
 
         public bool RemoveRegion(string region)
         {
-            throw new NotImplementedException();
+            return dataCache.RemoveRegion(region);
         }
 
         public void ClearRegion(string region)
         {
-            throw new NotImplementedException();
+            dataCache.ClearRegion(region);
         }
 
         public IEnumerable<KeyValuePair<string, object>> GetObjectsInRegion(string region)
         {
-            throw new NotImplementedException();
+            return dataCache.GetObjectsInRegion(region);
         }
 
-        public IEnumerable<KeyValuePair<string, object>> GetObjectsByAnyTag(IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags, string region)
+        public IEnumerable<KeyValuePair<string, object>> GetObjectsByAnyTag(IEnumerable<DataCacheTag> tags, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.GetObjectsByAnyTag(tags, region);
         }
 
-        public IEnumerable<KeyValuePair<string, object>> GetObjectsByAllTags(IEnumerable<Microsoft.ApplicationServer.Caching.DataCacheTag> tags, string region)
+        public IEnumerable<KeyValuePair<string, object>> GetObjectsByAllTags(IEnumerable<DataCacheTag> tags, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.GetObjectsByAllTags(tags, region);
         }
 
-        public IEnumerable<KeyValuePair<string, object>> GetObjectsByTag(Microsoft.ApplicationServer.Caching.DataCacheTag tag, string region)
+        public IEnumerable<KeyValuePair<string, object>> GetObjectsByTag(DataCacheTag tag, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.GetObjectsByTag(tag, region);
         }
 
         public string GetSystemRegionName(string key)
         {
-            throw new NotImplementedException();
+            return dataCache.GetSystemRegionName(key);
         }
 
         public IEnumerable<string> GetSystemRegions()
         {
-            throw new NotImplementedException();
+            return dataCache.GetSystemRegions();
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheNotificationDescriptor AddCacheLevelCallback(Microsoft.ApplicationServer.Caching.DataCacheOperations filter, Microsoft.ApplicationServer.Caching.DataCacheNotificationCallback clientCallback)
+        public DataCacheNotificationDescriptor AddCacheLevelCallback(DataCacheOperations filter, DataCacheNotificationCallback clientCallback)
         {
-            throw new NotImplementedException();
+            return dataCache.AddCacheLevelCallback(filter, clientCallback);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheNotificationDescriptor AddCacheLevelBulkCallback(Microsoft.ApplicationServer.Caching.DataCacheBulkNotificationCallback clientCallback)
+        public DataCacheNotificationDescriptor AddCacheLevelBulkCallback(DataCacheBulkNotificationCallback clientCallback)
         {
-            throw new NotImplementedException();
+            return dataCache.AddCacheLevelBulkCallback(clientCallback);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheNotificationDescriptor AddRegionLevelCallback(string region, Microsoft.ApplicationServer.Caching.DataCacheOperations filter, Microsoft.ApplicationServer.Caching.DataCacheNotificationCallback clientCallback)
+        public DataCacheNotificationDescriptor AddRegionLevelCallback(string region, DataCacheOperations filter, DataCacheNotificationCallback clientCallback)
         {
-            throw new NotImplementedException();
+            return dataCache.AddRegionLevelCallback(region, filter, clientCallback);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheNotificationDescriptor AddItemLevelCallback(string key, Microsoft.ApplicationServer.Caching.DataCacheOperations filter, Microsoft.ApplicationServer.Caching.DataCacheNotificationCallback clientCallback)
+        public DataCacheNotificationDescriptor AddItemLevelCallback(string key, DataCacheOperations filter, DataCacheNotificationCallback clientCallback)
         {
-            throw new NotImplementedException();
+            return dataCache.AddItemLevelCallback(key, filter, clientCallback);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheNotificationDescriptor AddItemLevelCallback(string key, Microsoft.ApplicationServer.Caching.DataCacheOperations filter, Microsoft.ApplicationServer.Caching.DataCacheNotificationCallback clientCallback, string region)
+        public DataCacheNotificationDescriptor AddItemLevelCallback(string key, DataCacheOperations filter, DataCacheNotificationCallback clientCallback, string region)
         {
-            throw new NotImplementedException();
+            return dataCache.AddItemLevelCallback(key, filter, clientCallback, region);
         }
 
-        public void RemoveCallback(Microsoft.ApplicationServer.Caching.DataCacheNotificationDescriptor nd)
+        public void RemoveCallback(DataCacheNotificationDescriptor nd)
         {
-            throw new NotImplementedException();
+            dataCache.RemoveCallback(nd);
         }
 
-        public Microsoft.ApplicationServer.Caching.DataCacheNotificationDescriptor AddFailureNotificationCallback(Microsoft.ApplicationServer.Caching.DataCacheFailureNotificationCallback failureCallback)
+        public DataCacheNotificationDescriptor AddFailureNotificationCallback(DataCacheFailureNotificationCallback failureCallback)
         {
-            throw new NotImplementedException();
+            return dataCache.AddFailureNotificationCallback(failureCallback);
         }
     }
 }
