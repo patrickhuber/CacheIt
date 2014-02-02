@@ -18,15 +18,25 @@ namespace CacheIt.AppFabric
         /// </summary>
         private IDataCache cache;
 
+        public AppFabricCache(string name, DataCacheFactory dataCacheFactory)
+            : this(name, new DataCacheFactoryAdapter(dataCacheFactory))
+        { 
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AppFabricCache"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="dataCacheFactory">The data cache factory.</param>
-        public AppFabricCache(string name, DataCacheFactory dataCacheFactory)
+        public AppFabricCache(string name, IDataCacheFactory dataCacheFactory)
             : base()
         {
             cache = dataCacheFactory.GetCache(name);
+        }
+
+        public AppFabricCache(DataCache dataCache)
+            : this(new DataCacheAdapter(dataCache))
+        { 
         }
 
         /// <summary>

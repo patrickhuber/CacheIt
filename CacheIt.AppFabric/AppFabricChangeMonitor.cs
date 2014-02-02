@@ -13,10 +13,10 @@ namespace CacheIt.AppFabric
     /// </summary>
     public sealed class AppFabricChangeMonitor : CacheEntryChangeMonitorBase, IDisposable
     {
-        private DataCache dataCache;
+        private IDataCache dataCache;
         private IList<DataCacheNotificationDescriptor> notificationDescriptorList;
 
-        public AppFabricChangeMonitor(ReadOnlyCollection<string> keys, string regionName, DataCache dataCache)
+        public AppFabricChangeMonitor(ReadOnlyCollection<string> keys, string regionName, IDataCache dataCache)
             : base(keys, regionName) 
         {
             this.dataCache = dataCache;            

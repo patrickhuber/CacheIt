@@ -7,6 +7,6 @@ namespace CacheIt.AppFabric
 {
     public interface IDataCacheFactory
     {
-        IDataCache GetCache(string name);
+        IDataCache GetCache(string cacheName);
     }
 }
