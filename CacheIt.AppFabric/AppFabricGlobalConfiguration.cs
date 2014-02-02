@@ -15,7 +15,7 @@ namespace CacheIt.AppFabric
         /// <summary>
         /// The data cache factory
         /// </summary>
-        private static DataCacheFactory dataCacheFactory;
+        private static IDataCacheFactory dataCacheFactory;
 
         /// <summary>
         /// Gets the dat cache factory.
@@ -23,7 +23,7 @@ namespace CacheIt.AppFabric
         /// <value>
         /// The dat cache factory.
         /// </value>
-        public static DataCacheFactory DatCacheFactory 
+        public static IDataCacheFactory DatCacheFactory 
         {
             get { return dataCacheFactory; }
         }
@@ -34,7 +34,7 @@ namespace CacheIt.AppFabric
         /// <exception cref="System.NotImplementedException"></exception>
         public void Configure()
         {
-            dataCacheFactory = new DataCacheFactory();
+            dataCacheFactory = new DataCacheFactoryAdapter(new DataCacheFactory());
         }
     }
 }
