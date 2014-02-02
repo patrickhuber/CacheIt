@@ -52,6 +52,7 @@
     <Compile Include="AppFabricCache.cs" />
     <Compile Include="AppFabricChangeMonitor.cs" />
     <Compile Include="AppFabricGlobalConfiguration.cs" />
+    <Compile Include="IDataCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
